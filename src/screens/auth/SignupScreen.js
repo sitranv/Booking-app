@@ -4,7 +4,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 import {Input, Text} from 'react-native-elements';
 import {Feather} from '@expo/vector-icons'
 import {MaterialIcons} from '@expo/vector-icons';
-import Logo from '../../image/logo.png'
+import Header from '../../components/Header';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import NavLink from "../../components/Navlink";
 import { Context as AuthContext } from '../../context/AuthContext';
@@ -25,10 +25,7 @@ const SignupScreen = () => {
             <NavigationEvents
                 onWillBlur={clearErrorMessage}
             />
-            <View style={styles.header}>
-                <Image source={Logo} style={styles.logo}/>
-                <Text h3 style={styles.title}>Signup to Vibo</Text>
-            </View>
+            <Header  text="Signup to Vibo"/>
             {state.errorMessage? <ErrCommon text={state.errorMessage}/>: null}
             <KeyboardAwareScrollView
                 style={styles.input}
@@ -86,6 +83,7 @@ const SignupScreen = () => {
                     </Picker>
                 </View>
                 <TouchableOpacity
+                    activeOpacity={.7}
                     style={styles.buttonView}
                     onPress={() => {signup({email, password, city, address})}}
                 >

@@ -12,6 +12,8 @@ const authReducer = (state, action) => {
             return {...state, errorMessage: action.payload}
         case 'clear_error':
             return {...state, errorMessage:''}
+        case 'signout':
+            return {token: null, errorMessage:''}
         default:
             return state;
     }
@@ -23,9 +25,7 @@ const signup = (dispatch) => {
             const response = await booking.post('/customer/auth/sign-up', user);
             await AsyncStorage.setItem('token', response.data.accessToken);
             dispatch({type: 'signin', payload: response.data.accessToken})
-            navigate('Home')
-
-            // console.log(response.data);
+            navigate('HomeScreen')
         } catch (err) {
             console.log(err)
             dispatch({type: 'add_err', payload: 'Something went wrong with sign up'})
@@ -37,11 +37,10 @@ const signup = (dispatch) => {
 const signin = (dispatch) => {
     return async (user) => {
         try {
-            // console.log(await AsyncStorage.getItem('token'));
             const response = await booking.post('/customer/auth/sign-in', user);
             await AsyncStorage.setItem('token', response.data.accessToken);
             dispatch({type: 'signin', payload: response.data.accessToken})
-            // navigate('Home')
+            navigate('HomeScreen')
         } catch (err) {
             dispatch({type: 'add_err', payload: 'Wrong email or password'})
             console.log(err.response.data);
@@ -58,15 +57,23 @@ const tryLocalSignin = (dispatch) => {
         const token = await AsyncStorage.getItem('token');
         if (token) {
             dispatch({type: 'signin', payload: token});
-            navigate('Home');
+            navigate('HomeScreen');
         } else {
-            navigate('Signup')
+            navigate('SignupScreen')
         }
+    }
+}
+
+const signout = (dispatch) => {
+    return async () => {
+        await AsyncStorage.removeItem('token');
+        dispatch({type : 'signout'});
+        navigate('SignupScreen');
     }
 }
 
 export const {Provider, Context} = createDataContext(
     authReducer,
-    {signup, signin, clearErrorMessage, tryLocalSignin},
+    {signup, signin, clearErrorMessage, tryLocalSignin, signout},
     {token : null, errorExistEmail : ''}
 )

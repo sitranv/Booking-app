@@ -7,25 +7,58 @@ import {navigate} from '../navigationRef';
 const bookingReducer = (state, action) => {
     switch (action.type) {
         case 'get_data':
-            return {...state, data : action.payload}
+            return {...state, data: action.payload.data}
+        case 'get_cities' :
+            return {...state, cities: action.payload.cities}
+        case 'get_hotel_by_id':
+            return {...state, hotel: action.payload}
         default:
             return state;
     }
 }
 
-const getData = (dispatch) => {
+const getDataOrderByScore = (dispatch) => {
     return async () => {
         try {
-            const response = await booking.get('/customer/locations');
+            const response = await booking.get('/customer/locations', {
+                params: {
+                    limit: 5,
+                    sort:'score,DESC'
+                }
+            });
             dispatch({type: 'get_data', payload: response.data})
-            console.log(response.data);
+            // console.log(response.data);
         } catch (e) {
             console.log(e.message);
         }
     }
 }
+
+const getCities = (dispatch) => {
+    return async () => {
+        try {
+            const response = await booking.get('/app/config');
+            dispatch({type: 'get_cities', payload: response.data})
+            // console.log(response.data);
+        } catch (e) {
+            console.log(e.message);
+        }
+    }
+}
+
+const getHotelById = (dispatch) => {
+    return async (hotel_id) => {
+        try {
+            const response = await booking.get(`/customer/locations/${hotel_id}`);
+            dispatch({type: 'get_hotel_by_id', payload: response.data})
+        } catch (e) {
+            console.log(e.message);
+        }
+    }
+}
+
 export const {Provider, Context} = createDataContext(
     bookingReducer,
-    {getData},
+    {getDataOrderByScore, getCities, getHotelById},
     {}
 )

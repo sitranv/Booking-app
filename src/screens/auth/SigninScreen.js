@@ -8,7 +8,7 @@ import NavLink from "../../components/Navlink";
 import {NavigationEvents} from "react-navigation";
 import { Context as AuthContext } from '../../context/AuthContext';
 import ErrCommon from "../../components/ErrCommon";
-
+import Header from "../../components/Header";
 const SigninScreen = () => {
     const {state, signin, clearErrorMessage} = useContext(AuthContext);
 
@@ -19,12 +19,8 @@ const SigninScreen = () => {
             <NavigationEvents
                 onWillBlur={clearErrorMessage}
             />
-            <View style={styles.header}>
-                <Image source={Logo} style={styles.logo}/>
-                <Text h3 style={styles.title}>Signin to Vibo</Text>
-            </View>
+            <Header text="Signin to Vibo"/>
             {state.errorMessage? <ErrCommon text={state.errorMessage}/>: null}
-
             <KeyboardAwareScrollView
                 style={styles.input}
                 behavior="padding"
@@ -73,7 +69,7 @@ SigninScreen.navigationOptions = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        marginTop: 100,
+        marginTop: 60,
         margin: 10
     },
     header: {
@@ -98,7 +94,7 @@ const styles = StyleSheet.create({
         marginTop: 10
     },
     input: {
-        marginTop: 40,
+        marginTop: 150,
         marginBottom: 20
     }
 })
