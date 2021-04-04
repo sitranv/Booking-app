@@ -12,7 +12,8 @@ const HomeScreen = () => {
         getDataOrderByScore();
         getCities();
     }, [])
-    var hotel = state.data
+    var hotel = state.data;
+    console.log(hotel);
     var cities = state.cities;
     return (
         <SafeAreaView forceInset={{top: 'always'}} style={styles.container}>
@@ -21,6 +22,9 @@ const HomeScreen = () => {
                 <FlatList
                     horizontal={true}
                     data={cities}
+                    keyExtractor={(item, index) => {
+                        return item.id;
+                    }}
                     renderItem={({item}) => {
                         return (<City
                             thumbnail={item.thumbnail}
@@ -31,10 +35,13 @@ const HomeScreen = () => {
                 />
             </View>
             <View style={styles.hotels}>
-                <Text style={styles.header}>Top Hotels</Text>
+                <Text style={styles.header}>Featured hotels</Text>
                 <FlatList
                     style={{marginTop: 5}}
                     data={hotel}
+                    keyExtractor={(item, index) => {
+                        return item.id;
+                    }}
                     renderItem={({item}) => {
                         return (
                             <View style={{flexDirection: 'row', flex: 1}}>
