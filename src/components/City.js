@@ -2,11 +2,12 @@ import React from "react";
 import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native'
 import {Entypo} from "@expo/vector-icons";
 
-const City = ({thumbnail, name, averagePrice}) => {
+const City = ({thumbnail, name, averagePrice, getHotelByCity, cityId}) => {
     return ( <TouchableOpacity
         activeOpacity={.7}
         style={styles.container}
         onPress={() => {
+            getHotelByCity(cityId);
         }}
     >
         {thumbnail?<Image source={{ uri: thumbnail}} style={styles.image}/> : null}

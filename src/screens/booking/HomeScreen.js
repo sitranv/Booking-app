@@ -7,19 +7,22 @@ import City from "../../components/City";
 import Header from "../../components/Header";
 
 const HomeScreen = () => {
-    const {state, getDataOrderByScore, getCities} = useContext(BookingContext);
+    const {state, getDataOrderByScore, getCities, getHotelByCity} = useContext(BookingContext);
     useEffect(() => {
         getDataOrderByScore();
         getCities();
     }, [])
     var hotel = state.data;
-    console.log(hotel);
+    // console.log(hotel);
     var cities = state.cities;
+    // console.log(cities)
     return (
         <SafeAreaView forceInset={{top: 'always'}} style={styles.container}>
             <Header text="Vibo"/>
             <View style={styles.city}>
                 <FlatList
+                    showsVerticalScrollIndicator={false}
+                    showsHorizontalScrollIndicator={false}
                     horizontal={true}
                     data={cities}
                     keyExtractor={(item, index) => {
@@ -30,6 +33,8 @@ const HomeScreen = () => {
                             thumbnail={item.thumbnail}
                             name={item.name}
                             averagePrice={item.averagePrice}
+                            getHotelByCity={getHotelByCity}
+                            cityId={item.id}
                         />)
                     }}
                 />
@@ -37,6 +42,9 @@ const HomeScreen = () => {
             <View style={styles.hotels}>
                 <Text style={styles.header}>Featured hotels</Text>
                 <FlatList
+                    showsVerticalScrollIndicator={false}
+                    showsHorizontalScrollIndicator={false}
+                    extraData={state.data}
                     style={{marginTop: 5}}
                     data={hotel}
                     keyExtractor={(item, index) => {
@@ -50,7 +58,7 @@ const HomeScreen = () => {
                                     score={item.score}
                                     image={item.images}
                                     name={item.name}
-                                    address={item.address}
+                                    address={item.city.name}
                                 />
                             </View>)
                     }}

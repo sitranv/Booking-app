@@ -1,11 +1,12 @@
 import React, {useContext} from "react";
-import {FlatList, Image, StyleSheet, View} from 'react-native'
+import {FlatList, Image, StyleSheet, View, TouchableOpacity} from 'react-native'
 import {Text, ListItem} from "react-native-elements";
 import {Context as BookingContext} from '../../context/BookingContext';
 import {SwiperFlatList} from 'react-native-swiper-flatlist';
 import {SafeAreaView} from "react-navigation";
 import {Entypo, FontAwesome} from "@expo/vector-icons";
 import Room from "../../components/Room";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 
 const HotelDetail = ({navigation}) => {
     const {state} = useContext(BookingContext);
@@ -21,7 +22,7 @@ const HotelDetail = ({navigation}) => {
             stars.push(<FontAwesome name="star-o" size={20} color="#FFBC42" style={{marginLeft: 4}}/>);
         }
     }
-
+    console.log(hotel);
     return (
         <SafeAreaView forceInset={{top: 'always'}} style={styles.container}>
             <SwiperFlatList
@@ -41,7 +42,7 @@ const HotelDetail = ({navigation}) => {
                 <View style={styles.container1}>
                     <View style={{flexDirection: 'row', marginTop: 10, marginLeft: 5,}}>
                         <View style={{width: 350}}>
-                            <Text h4>{hotel.name}</Text>
+                            <Text h4 numberOfLines={2} ellipsizeMode='tail'>{hotel.name}</Text>
                         </View>
                         <View>
                             <Text style={styles.score}>{hotel.score}</Text>
@@ -58,12 +59,26 @@ const HotelDetail = ({navigation}) => {
                         {stars}
                     </View>
                     <View style={{marginTop: 5, marginLeft: 5}}>
-                        <Text style={styles.address} numberOfLines={2} ellipsizeMode='tail'><Entypo name="location-pin" size={15} color="black" />{hotel.address}</Text>
+                        <Text style={styles.address} numberOfLines={2} ellipsizeMode='tail'>
+                            <Entypo name="location-pin" size={15} color="black"/>{hotel.address}
+                        </Text>
                     </View>
                 </View>
-                <View style={styles.container2}>
-                    <Text>{hotel.description}</Text>
+                <View style={styles.container3}>
+                    <Text numberOfLines={8} ellipsizeMode='tail' style={styles.priceMobile}>Mobile-only price</Text>
+                    <Text numberOfLines={8} ellipsizeMode='tail' style={styles.price}>VND {hotel.price.split('D')[1]}</Text>
                 </View>
+                <View style={styles.container2}>
+                    <Text style={styles.description} numberOfLines={8} ellipsizeMode='tail'>{hotel.description}</Text>
+                </View>
+                <TouchableOpacity
+                    activeOpacity={.7}
+                    style={styles.buttonView}
+                    onPress={() => {
+                        navigation.navigate('RoomScreen', {rooms: hotel.rooms, services : hotel.serviceTypes});
+                    }}>
+                    <Text style={{color: 'white', fontSize: 16,}}>Select rooms</Text>
+                </TouchableOpacity>
             </View>
         </SafeAreaView>
     )
@@ -79,17 +94,26 @@ const styles = StyleSheet.create({
         backgroundColor: '#e1eef6',
     },
     container1: {
-        height: 150,
-        backgroundColor:'white',
+        height: 160,
+        backgroundColor: 'white',
         borderBottomRightRadius: 5,
         borderBottomLeftRadius: 5
     },
     container2: {
-        marginTop : 5,
-        // height: 150,
-        backgroundColor:'white',
+        marginTop: 5,
+        height: 200,
+        backgroundColor: 'white',
         borderTopRightRadius: 5,
         borderTopLeftRadius: 5
+    },
+    container3 : {
+        marginTop: 5,
+        height: 90,
+        backgroundColor: 'white',
+        borderTopRightRadius: 5,
+        borderTopLeftRadius: 5,
+        flexDirection: 'column',
+        alignItems: 'stretch'
     },
     content: {
         // marginTop: 10,
@@ -98,7 +122,7 @@ const styles = StyleSheet.create({
     },
     score: {
         marginLeft: 7,
-        paddingVertical: 9,
+        paddingVertical: 10,
         paddingHorizontal: 13,
         backgroundColor: '#2b90d9',
         textAlign: 'center',
@@ -106,6 +130,39 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 5,
         borderTopRightRadius: 7,
         borderBottomRightRadius: 7
+    },
+    description: {
+        marginLeft: 7,
+        padding: 10,
+        fontSize: 15
+    },
+    buttonView: {
+        marginTop: 6,
+        marginHorizontal: 10,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        width: 390,
+        paddingTop: 15,
+        paddingBottom: 15,
+        backgroundColor: '#2274A5',
+    },
+    priceMobile : {
+        marginTop: 10,
+        marginLeft: 15,
+        padding: 5,
+        fontSize: 13,
+        width: 130,
+        backgroundColor: '#F68657'
+    },
+    price: {
+        marginTop: 10,
+        marginRight: 10,
+        padding: 5,
+        fontSize: 25,
+        // width: 160,
+        fontWeight: 'bold',
+        alignSelf: 'flex-end',
+        marginBottom: 5,
     }
 })
 

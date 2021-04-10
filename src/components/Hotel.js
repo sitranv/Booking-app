@@ -29,8 +29,13 @@ const Hotel = ({image, name, address, navigation, score, id}) => {
                 </View>
                 <View style={styles.info}>
                     <Text style={styles.name} numberOfLines={1} ellipsizeMode='tail'>{name}</Text>
-                    <View style={{marginTop: 5, width: 185}}>
-                        <Text style={styles.address} numberOfLines={2} ellipsizeMode='tail'><Entypo name="location-pin" size={15} color="black" />{address}</Text>
+                    <View style={{flexDirection: 'row'}}>
+                        <View style={{marginTop: 5, width: 130}}>
+                            <Text style={styles.address} numberOfLines={2} ellipsizeMode='tail'><Entypo name="location-pin" size={15} color="black" />{address}</Text>
+                        </View>
+                        <View>
+                            <Text style={styles.score}>{score}</Text>
+                        </View>
                     </View>
                 </View>
             </View>
@@ -70,8 +75,18 @@ const styles = StyleSheet.create({
     },
     address: {
         fontSize: 14,
-
-    }
+    },
+    score: {
+        marginLeft: 7,
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        backgroundColor: '#2b90d9',
+        textAlign: 'center',
+        color: 'white',
+        borderTopLeftRadius: 5,
+        borderTopRightRadius: 7,
+        borderBottomRightRadius: 7
+    },
 })
 
 export default withNavigation(Hotel);

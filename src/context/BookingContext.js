@@ -22,12 +22,13 @@ const getDataOrderByScore = (dispatch) => {
         try {
             const response = await booking.get('/customer/locations', {
                 params: {
-                    limit: 20,
+                    limit: 10,
                     sort: 'score,DESC',
-                    join: ['locationType', 'city', 'rooms'],
+                    join: ['locationType', 'city', 'rooms', 'serviceTypes'],
                 }
             });
             dispatch({type: 'get_data', payload: response.data})
+            console.log(response.data.data);
         } catch (e) {
             console.log(e.message);
         }
@@ -46,9 +47,28 @@ const getCities = (dispatch) => {
     }
 }
 
+const getHotelByCity = (dispatch) => {
+    return async (cityId) => {
+        try {
+            const response = await booking.get('/customer/locations', {
+                params: {
+                    limit: 10,
+                    sort: 'score,DESC',
+                    join: ['locationType', 'city', 'rooms', 'serviceTypes'],
+                    filter: `cityId||$eq||${cityId}`
+                }
+            });
+            // console.log(cityId);
+            dispatch({type: 'get_data', payload: response.data})
+            // console.log(response.data)
+        } catch (e) {
+            console.log(e.message)
+        }
+    }
+}
 
 export const {Provider, Context} = createDataContext(
     bookingReducer,
-    {getDataOrderByScore, getCities},
+    {getDataOrderByScore, getCities, getHotelByCity},
     {}
 )

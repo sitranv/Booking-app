@@ -57,7 +57,8 @@ const tryLocalSignin = (dispatch) => {
         const token = await AsyncStorage.getItem('token');
         if (token) {
             dispatch({type: 'signin', payload: token});
-            navigate('HomeScreen');
+            navigate('Home');
+            // navigate('Room');
         } else {
             navigate('SignupScreen')
         }
