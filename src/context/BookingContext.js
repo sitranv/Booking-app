@@ -7,11 +7,14 @@ import {navigate} from '../navigationRef';
 const bookingReducer = (state, action) => {
     switch (action.type) {
         case 'get_data':
-            return {...state, data: action.payload.data}
+            let searchField = action.name ? action.name : 'Featured hotels'
+            return {...state, data: action.payload.data , searchField}
         case 'get_cities' :
             return {...state, cities: action.payload.cities}
         case 'get_hotel_by_id':
             return {...state, hotel: action.payload}
+        case 'get_rooms' :
+            return {...state, availableRooms: action.payload}
         default:
             return state;
     }
@@ -48,7 +51,7 @@ const getCities = (dispatch) => {
 }
 
 const getHotelByCity = (dispatch) => {
-    return async (cityId) => {
+    return async (cityId, cityName) => {
         try {
             const response = await booking.get('/customer/locations', {
                 params: {
@@ -59,7 +62,7 @@ const getHotelByCity = (dispatch) => {
                 }
             });
             // console.log(cityId);
-            dispatch({type: 'get_data', payload: response.data})
+            dispatch({type: 'get_data', payload: response.data, name : cityName})
             // console.log(response.data)
         } catch (e) {
             console.log(e.message)
@@ -67,8 +70,24 @@ const getHotelByCity = (dispatch) => {
     }
 }
 
+const getRoomAvailable = (dispatch) => {
+    return async (locationId, checkin, checkout) => {
+        try {
+            const response = await booking.get(`/customer/locations/${locationId}/bookings`, {
+                params: {
+                    startTime : checkin,
+                    endTime : checkout
+                }
+            })
+            console.log(response);
+            dispatch({type: 'get_rooms', payload: response.data})
+        } catch (e) {
+
+        }
+    }
+}
 export const {Provider, Context} = createDataContext(
     bookingReducer,
-    {getDataOrderByScore, getCities, getHotelByCity},
+    {getDataOrderByScore, getCities, getHotelByCity, getRoomAvailable},
     {}
 )

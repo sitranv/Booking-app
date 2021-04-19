@@ -7,7 +7,7 @@ import {navigate} from '../navigationRef';
 const authReducer = (state, action) => {
     switch (action.type) {
         case 'signin':
-            return {errorMessage:'', token: action.payload}
+            return {errorMessage:'', token: action.payload.token, user: action.payload.user}
         case 'add_err':
             return {...state, errorMessage: action.payload}
         case 'clear_error':
@@ -24,7 +24,11 @@ const signup = (dispatch) => {
         try {
             const response = await booking.post('/customer/auth/sign-up', user);
             await AsyncStorage.setItem('token', response.data.accessToken);
-            dispatch({type: 'signin', payload: response.data.accessToken})
+            dispatch({type: 'signin', payload: {
+                    token : response.data.accessToken,
+                    user: response.data.user
+                }
+            })
             navigate('HomeScreen')
         } catch (err) {
             console.log(err)
@@ -39,7 +43,11 @@ const signin = (dispatch) => {
         try {
             const response = await booking.post('/customer/auth/sign-in', user);
             await AsyncStorage.setItem('token', response.data.accessToken);
-            dispatch({type: 'signin', payload: response.data.accessToken})
+            dispatch({type: 'signin', payload: {
+                    token : response.data.accessToken,
+                    user: response.data.user
+                }
+            })
             navigate('HomeScreen')
         } catch (err) {
             dispatch({type: 'add_err', payload: 'Wrong email or password'})
@@ -54,14 +62,32 @@ const clearErrorMessage = (dispatch) => {
 
 const tryLocalSignin = (dispatch) => {
     return async () => {
-        const token = await AsyncStorage.getItem('token');
-        if (token) {
-            dispatch({type: 'signin', payload: token});
-            navigate('Home');
-            // navigate('Room');
-        } else {
-            navigate('SignupScreen')
+        try {
+            const token = await AsyncStorage.getItem('token');
+            console.log(token);
+            const response = await booking.get('/customer/users/me', {
+                headers : {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+            });
+            console.log(token, response);
+            if (token) {
+                dispatch({type: 'signin', payload: {
+                        token : token,
+                        user : response.data
+                    }
+                });
+                navigate('Home');
+                // navigate('Room');
+            } else {
+                navigate('SigninScreen')
+            }
+        } catch (e) {
+            console.log(e.message);
         }
+
     }
 }
 

@@ -1,15 +1,22 @@
-import React, {useContext} from "react";
-import {FlatList, Image, StyleSheet, View, TouchableOpacity} from 'react-native'
+import React, {useContext, useState} from "react";
+import {FlatList, Image, StyleSheet, View, TouchableOpacity, Alert, Modal} from 'react-native'
 import {Text, ListItem} from "react-native-elements";
 import {Context as BookingContext} from '../../context/BookingContext';
 import {SwiperFlatList} from 'react-native-swiper-flatlist';
 import {SafeAreaView} from "react-navigation";
 import {Entypo, FontAwesome} from "@expo/vector-icons";
+import DatePicker from 'react-native-datepicker'
 import Room from "../../components/Room";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 
 const HotelDetail = ({navigation}) => {
-    const {state} = useContext(BookingContext);
+    const {state, getRoomAvailable} = useContext(BookingContext);
+    let now = new Date();
+    let date = now.getFullYear()+ '/' + (now.getMonth() + 1)  + '/' +  now.getDate();
+    const [modalVisible, setModalVisible] = useState(false);
+    const [dateFrom, setDateFrom] = useState(date);
+    const [dateTo, setDateTo] = useState(date);
+
     let hotel_id = navigation.getParam('id');
     const hotel = state.data.find(
         hotel => hotel.id === hotel_id
@@ -22,7 +29,6 @@ const HotelDetail = ({navigation}) => {
             stars.push(<FontAwesome name="star-o" size={20} color="#FFBC42" style={{marginLeft: 4}}/>);
         }
     }
-    console.log(hotel);
     return (
         <SafeAreaView forceInset={{top: 'always'}} style={styles.container}>
             <SwiperFlatList
@@ -71,14 +77,90 @@ const HotelDetail = ({navigation}) => {
                 <View style={styles.container2}>
                     <Text style={styles.description} numberOfLines={8} ellipsizeMode='tail'>{hotel.description}</Text>
                 </View>
+
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={modalVisible}
+                    onRequestClose={() => {
+                        Alert.alert("Modal has been closed.");
+                        setModalVisible(!modalVisible);
+                    }}
+                >
+                    <View style={styles.centeredView}>
+                        <View style={styles.modalView}>
+                            <Text h4>Choose date</Text>
+                            <View style={{flexDirection: 'row', marginTop: 20}}>
+                                <View>
+                                    <Text>Check-in date</Text>
+                                    <DatePicker
+                                        style={{width: 170}}
+                                        date={dateFrom}
+                                        mode="date"
+                                        format="YYYY/MM/DD"
+                                        showIcon={false}
+                                        onDateChange={(date) => setDateFrom(date)}
+                                        androidMode={"default"}
+                                    />
+                                </View>
+                                <Text h4 style={{marginTop: 20, marginHorizontal: 10}}> - </Text>
+                                <View>
+                                    <Text>Check-out date</Text>
+                                    <DatePicker
+                                        style={{width: 170}}
+                                        date={dateTo}
+                                        mode="date"
+                                        format="YYYY/MM/DD"
+                                        showIcon={false}
+                                        onDateChange={(date) => setDateTo(date)}
+                                        androidMode={"default"}
+                                    />
+                                </View>
+                            </View>
+                            <View style={{flexDirection: 'row', marginTop: 20}}>
+                                <TouchableOpacity
+                                    style={[styles.button, styles.buttonClose, {marginRight: 15}]}
+                                    onPress={() => setModalVisible(!modalVisible)}
+                                >
+                                    <Text style={styles.textStyle}>Cancel</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[styles.button, styles.buttonSubmit, {marginLeft : 15}]}
+                                    onPress={() => {
+                                        // console.log(dateFrom, dateTo);
+                                        setModalVisible(!modalVisible)
+                                        let startTime = new Date(dateFrom).toISOString();
+                                        let endTime = new Date(dateTo).toISOString();
+                                        getRoomAvailable(hotel.id, startTime, endTime);
+                                        navigation.navigate('RoomScreen' , {services : hotel.serviceTypes});
+                                    }}
+                                >
+                                    <Text style={styles.textStyle}>Submit</Text>
+                                </TouchableOpacity>
+                            </View>
+
+                        </View>
+                    </View>
+                </Modal>
+
+
                 <TouchableOpacity
                     activeOpacity={.7}
                     style={styles.buttonView}
                     onPress={() => {
-                        navigation.navigate('RoomScreen', {rooms: hotel.rooms, services : hotel.serviceTypes});
+                        setModalVisible(!modalVisible);
                     }}>
-                    <Text style={{color: 'white', fontSize: 16,}}>Select rooms</Text>
+                    <Text style={{color: 'white', fontSize: 16,}}>Book now</Text>
                 </TouchableOpacity>
+
+                {/*<TouchableOpacity*/}
+                {/*    activeOpacity={.7}*/}
+                {/*    style={styles.buttonView}*/}
+                {/*    onPress={() => {*/}
+                {/*        navigation.navigate('RoomScreen', {rooms: hotel.rooms, services : hotel.serviceTypes});*/}
+                {/*    }}>*/}
+                {/*    <Text style={{color: 'white', fontSize: 16,}}>Book now</Text>*/}
+                {/*</TouchableOpacity>*/}
             </View>
         </SafeAreaView>
     )
@@ -163,6 +245,50 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         alignSelf: 'flex-end',
         marginBottom: 5,
+    },
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 22
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: "white",
+        borderRadius: 20,
+        padding: 20,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5
+    },
+    button: {
+        borderRadius: 20,
+        padding: 10,
+        elevation: 2,
+    },
+    buttonOpen: {
+        backgroundColor: "#F194FF",
+    },
+    buttonClose: {
+        backgroundColor: "#52616a",
+    },
+    buttonSubmit: {
+        backgroundColor: "#2196F3",
+    },
+    textStyle: {
+        color: "white",
+        fontWeight: "bold",
+        textAlign: "center"
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: "center"
     }
 })
 

@@ -6,7 +6,7 @@ import {FontAwesome5} from '@expo/vector-icons';
 import {withNavigation} from "react-navigation";
 import { Ionicons } from '@expo/vector-icons';
 
-const Room = ({roomName, id, capacity, price}) => {
+const Room = ({roomName, id, capacity, price, services, navigation, room}) => {
     let peoples = [];
     if (capacity <= 4) {
         for (let i = 0; i < capacity; i++) {
@@ -28,6 +28,29 @@ const Room = ({roomName, id, capacity, price}) => {
             break;
         }
     }
+
+    let services_temp = [];
+    let index = [];
+    for (let i = 0; i < Math.round(services.length / 2) - 1; i++) {
+        let j = Math.floor(Math.random() * services.length);
+        while (index.includes(j)) {
+            j = Math.floor(Math.random() * services.length);
+        }
+        index.push(j)
+        services_temp.push(services[j]);
+    }
+
+    let servicesView = [];
+
+    for(let i = 0; i < services_temp.length; i++) {
+        servicesView.push(
+            <View style={{flexDirection:'row'}}>
+                <Image source={{uri: services_temp[i].icon}} style={{width : 22, height: 22}}/>
+                <Text style={{marginLeft: 10}}>{services_temp[i].name}</Text>
+            </View> 
+        )
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.containerFluid}>
@@ -37,8 +60,8 @@ const Room = ({roomName, id, capacity, price}) => {
                     {peoples}
                     <Text style={{fontSize: 15, marginLeft :5}}>({capacity})</Text>
                 </View>
-                <View>
-                    <Text>Service</Text>
+                <View style={{flexDirection: 'column'}}>
+                    {servicesView}
                 </View>
                 <View style={{flexDirection: 'row', marginTop: 10}}>
                     {/*<View style={{*/}
@@ -59,15 +82,15 @@ const Room = ({roomName, id, capacity, price}) => {
                         <Text>Getaway Deal</Text>
                     </View>
                 </View>
-                <View style={{alignSelf: 'flex-end'}}>
-                    <Text style={{marginLeft: 10, fontSize: 16, textAlign : 'right'}}>Price for 2 nights</Text>
-                    <View style={{flexDirection: 'row', marginLeft: 15}}>
-                        <Text style={{marginRight: 5, fontSize: 18, fontWeight: 'bold', color: '#df405a'}}>VND {priceString}</Text>
+                <View style={{flexDirection: 'column'}}>
+                    <Text style={{marginLeft: 10, fontSize: 16, textAlign : 'right'}}>Price for 1 night</Text>
+                    <View style={{flexDirection: 'row', alignSelf: 'flex-end'}}>
+                        <Text style={{marginRight: 5, fontSize: 18, fontWeight: 'bold', color: '#df405a', alignSelf: 'flex-end'}}>VND {priceString}</Text>
                         <View style={{marginTop: 3}}>
                             <FontAwesome5 name="coins" size={20} color="black"/>
                         </View>
                     </View>
-                    <View style={{flexDirection: 'row'}}>
+                    <View style={{flexDirection: 'row', alignSelf: 'flex-end'}}>
                         <Ionicons name="checkmark-outline" size={24} color="#3ac569" />
                         <Text style={{color: '#3ac569', textAlign : 'right'}}>Includes taxs and fees</Text>
                     </View>
@@ -75,8 +98,11 @@ const Room = ({roomName, id, capacity, price}) => {
                 <TouchableOpacity
                     style={styles.buttonBook}
                     activeOpacity={.7}
+                    onPress={() => {
+                        navigation.navigate('Step1', {})
+                    }}
                 >
-                    <Text style={styles.buttonText}>Book room</Text>
+                    <Text style={styles.buttonText}>Reserve</Text>
                 </TouchableOpacity>
             </View>
         </View>

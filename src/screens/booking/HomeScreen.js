@@ -7,7 +7,7 @@ import City from "../../components/City";
 import Header from "../../components/Header";
 
 const HomeScreen = () => {
-    const {state, getDataOrderByScore, getCities, getHotelByCity} = useContext(BookingContext);
+    const {state, getDataOrderByScore, getCities, getHotelByCity, searchField} = useContext(BookingContext);
     useEffect(() => {
         getDataOrderByScore();
         getCities();
@@ -40,7 +40,7 @@ const HomeScreen = () => {
                 />
             </View>
             <View style={styles.hotels}>
-                <Text style={styles.header}>Featured hotels</Text>
+                <Text style={styles.header}>{state.searchField}</Text>
                 <FlatList
                     showsVerticalScrollIndicator={false}
                     showsHorizontalScrollIndicator={false}

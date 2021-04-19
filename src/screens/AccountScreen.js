@@ -5,8 +5,12 @@ import {Button} from "react-native-elements";
 import {Context as AuthContext} from "../context/AuthContext";
 
 const AccountScreen = () => {
-    const {signout} = useContext(AuthContext);
+    const {signout, state} = useContext(AuthContext);
     return (<SafeAreaView style={styles.container} forceInset={{top:'always'}}>
+        <Text>{state.user.fullName}</Text>
+        <Text>{state.user.email}</Text>
+        <Text>{state.user.city}</Text>
+        <Text>{state.user.address}</Text>
         <Button style={styles.button} title="Sign out" onPress={signout}/>
     </SafeAreaView>)
 }

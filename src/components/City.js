@@ -7,7 +7,7 @@ const City = ({thumbnail, name, averagePrice, getHotelByCity, cityId}) => {
         activeOpacity={.7}
         style={styles.container}
         onPress={() => {
-            getHotelByCity(cityId);
+            getHotelByCity(cityId, name);
         }}
     >
         {thumbnail?<Image source={{ uri: thumbnail}} style={styles.image}/> : null}
