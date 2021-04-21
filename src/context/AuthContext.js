@@ -24,6 +24,7 @@ const signup = (dispatch) => {
         try {
             const response = await booking.post('/customer/auth/sign-up', user);
             await AsyncStorage.setItem('token', response.data.accessToken);
+
             dispatch({type: 'signin', payload: {
                     token : response.data.accessToken,
                     user: response.data.user
@@ -43,12 +44,15 @@ const signin = (dispatch) => {
         try {
             const response = await booking.post('/customer/auth/sign-in', user);
             await AsyncStorage.setItem('token', response.data.accessToken);
+
+            console.log(response);
             dispatch({type: 'signin', payload: {
                     token : response.data.accessToken,
                     user: response.data.user
                 }
             })
             navigate('HomeScreen')
+            console.log(response);
         } catch (err) {
             dispatch({type: 'add_err', payload: 'Wrong email or password'})
             console.log(err.response.data);
@@ -64,7 +68,7 @@ const tryLocalSignin = (dispatch) => {
     return async () => {
         try {
             const token = await AsyncStorage.getItem('token');
-            console.log(token);
+            // console.log(token);
             const response = await booking.get('/customer/users/me', {
                 headers : {
                     'Accept': 'application/json',
@@ -73,10 +77,11 @@ const tryLocalSignin = (dispatch) => {
                 },
             });
             console.log(token, response);
+
             if (token) {
                 dispatch({type: 'signin', payload: {
                         token : token,
-                        user : response.data
+                        user : response.data,
                     }
                 });
                 navigate('Home');
@@ -94,6 +99,7 @@ const tryLocalSignin = (dispatch) => {
 const signout = (dispatch) => {
     return async () => {
         await AsyncStorage.removeItem('token');
+        await AsyncStorage.removeItem('user_info');
         dispatch({type : 'signout'});
         navigate('SignupScreen');
     }

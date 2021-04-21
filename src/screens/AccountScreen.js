@@ -11,6 +11,7 @@ const AccountScreen = () => {
         <Text>{state.user.email}</Text>
         <Text>{state.user.city}</Text>
         <Text>{state.user.address}</Text>
+        <Text>{state.user.phoneNumber}</Text>
         <Button style={styles.button} title="Sign out" onPress={signout}/>
     </SafeAreaView>)
 }

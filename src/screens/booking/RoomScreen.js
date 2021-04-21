@@ -11,11 +11,12 @@ const RoomScreen = ({navigation}) => {
     const {state} = useContext(BookingContext);
     let rooms = state.availableRooms;
     let services_temp = navigation.getParam('services');
+    let hotel = navigation.getParam('hotel');
     let services = [];
     for (let i = 0; i < 3; i++) {
         services.push(services_temp[Math.floor(Math.random() * services_temp.length)])
     }
-    console.log(services)
+    // console.log(services)
     return (
         <SafeAreaView style={styles.container} forceInset={{top: 'always'}}>
             <Text h3 style={{marginLeft: 6, marginVertical: 5}}>Available Rooms</Text>
@@ -33,6 +34,7 @@ const RoomScreen = ({navigation}) => {
                             id={item.id}
                             services={services}
                             room={item}
+                            hotel={hotel}
                         />)
                 }}
                 />

@@ -15,6 +15,7 @@ import AccountScreen from "./src/screens/AccountScreen";
 import HotelDetail from './src/screens/booking/HotelDetail'
 import RoomScreen from "./src/screens/booking/RoomScreen";
 import Step1 from './src/screens/booking/confirm/Step1'
+import Step2 from './src/screens/booking/confirm/Step2'
 import {Provider as AuthProvider} from './src/context/AuthContext'
 import {Provider as BookingProvider} from './src/context/BookingContext'
 import Hotel from "./src/components/Hotel";
@@ -33,6 +34,7 @@ const switchNavigator = createSwitchNavigator({
             HotelDetail: HotelDetail,
             RoomScreen: RoomScreen,
             Step1: Step1,
+            Step2: Step2,
         }),
         AccountScreen: AccountScreen
     }),

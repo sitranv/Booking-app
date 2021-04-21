@@ -1,28 +1,102 @@
-import React, {useContext} from "react";
-import {FlatList, Image, StyleSheet, View, TouchableOpacity} from 'react-native'
-import {Text, ListItem} from "react-native-elements";
+import React, {useContext, useState} from "react";
+import {FlatList, Image, StyleSheet, View, TouchableOpacity, Button} from 'react-native'
+import {Text, ListItem, Input} from "react-native-elements";
 import {SafeAreaView} from "react-navigation";
-import {Entypo, FontAwesome} from "@expo/vector-icons";
+import {Entypo, FontAwesome, FontAwesome5, Ionicons} from "@expo/vector-icons";
+import {Context as AuthContext} from "../../../context/AuthContext";
 
 const Step1 = ({navigation}) => {
+    const {state} = useContext(AuthContext);
+    let room = navigation.getParam('room');
+    let hotel = navigation.getParam('hotel');
 
+    let priceString = '';
+    let price = Math.floor(room.price);
+    while (price > 999) {
+        let num = price % 1000;
+        priceString += '.' + num;
+        price = Math.floor(price / 1000);
+        if (price <= 999) {
+            priceString = price + '' + priceString;
+            break;
+        }
+    }
     return (
         <SafeAreaView style={styles.container} forceInset={{top: 'always'}}>
-            <Text h3 style={{marginLeft: 6, marginVertical: 5}}>Step1</Text>
+            <View style={{ marginHorizontal: 5}}>
+                <Text style={{marginLeft: 6, marginVertical: 5}}>Your full name</Text>
+                <Input
+                    editable={false}
+                    value={state.user.fullName}
+                />
+                <Text style={{marginLeft: 6, marginVertical: 5}}>Your email</Text>
+                <Input
+                    editable={false}
+                    value={state.user.email}
+                />
+                <Text style={{marginLeft: 6, marginVertical: 5}}>Your phone number</Text>
+                <Input
+                    editable={false}
+                    value={state.user.phoneNumber}
+                />
+            </View>
+            <View style={styles.buttonContainer}>
+                <View style={{flexDirection: 'column', marginLeft: 10}}>
+                    <Text style={{fontSize: 16, textAlign: 'left'}}>Price for 1 night</Text>
+                    <View style={{flexDirection: 'row', alignSelf: 'flex-start'}}>
+                        <Text style={{
+                            marginRight: 5,
+                            fontSize: 18,
+                            fontWeight: 'bold',
+                            color: '#df405a',
+                            alignSelf: 'flex-start'
+                        }}>VND {priceString}</Text>
+                        <View style={{marginTop: 3}}>
+                            <FontAwesome5 name="coins" size={20} color="black"/>
+                        </View>
+                    </View>
+                    <View style={{flexDirection: 'row', alignSelf: 'flex-start'}}>
+                        <Ionicons name="checkmark-outline" size={24} color="#3ac569"/>
+                        <Text style={{color: '#3ac569', textAlign: 'left'}}>Includes taxs and fees</Text>
+                    </View>
+                </View>
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => {
+                        navigation.navigate('Step2', {room : room, hotel: hotel})
+                    }}
+                >
+                    <Text style={{color: 'white', fontSize: 17}}>Next step</Text>
+                </TouchableOpacity>
+            </View>
         </SafeAreaView>
     )
 }
 
 Step1.navigationOptions = () => {
     return {
-        headerShown: false,
+        // headerShown: false,
     }
 }
 const styles = StyleSheet.create({
-    container : {
+    container: {
         paddingTop: 5,
-        backgroundColor: '#e1eef6',
-        flex : 1,
+        backgroundColor: 'white',
+        flex: 1,
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 20,
+    },
+    button: {
+        marginTop: 10,
+        paddingVertical: 19,
+        paddingHorizontal: 40,
+        backgroundColor: '#2274A5',
+        alignItems: 'center',
+        marginRight: 5,
+        marginBottom: 10,
     }
 })
 

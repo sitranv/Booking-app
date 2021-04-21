@@ -132,7 +132,7 @@ const HotelDetail = ({navigation}) => {
                                         let startTime = new Date(dateFrom).toISOString();
                                         let endTime = new Date(dateTo).toISOString();
                                         getRoomAvailable(hotel.id, startTime, endTime);
-                                        navigation.navigate('RoomScreen' , {services : hotel.serviceTypes});
+                                        navigation.navigate('RoomScreen' , {services : hotel.serviceTypes, hotel: hotel});
                                     }}
                                 >
                                     <Text style={styles.textStyle}>Submit</Text>
