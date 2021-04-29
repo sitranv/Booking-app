@@ -12,6 +12,10 @@ const RoomScreen = ({navigation}) => {
     let rooms = state.availableRooms;
     let services_temp = navigation.getParam('services');
     let hotel = navigation.getParam('hotel');
+    let dateFrom = navigation.getParam('dateFrom');
+    let dateTo = navigation.getParam('dateTo');
+    let stars = navigation.getParam('stars');
+
     let services = [];
     for (let i = 0; i < 3; i++) {
         services.push(services_temp[Math.floor(Math.random() * services_temp.length)])
@@ -35,6 +39,9 @@ const RoomScreen = ({navigation}) => {
                             services={services}
                             room={item}
                             hotel={hotel}
+                            dateFrom={dateFrom}
+                            dateTo={dateTo}
+                            stars={stars}
                         />)
                 }}
                 />

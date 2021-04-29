@@ -11,8 +11,11 @@ import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 
 const HotelDetail = ({navigation}) => {
     const {state, getRoomAvailable} = useContext(BookingContext);
+
     let now = new Date();
-    let date = now.getFullYear()+ '/' + (now.getMonth() + 1)  + '/' +  now.getDate();
+    let date = now.getFullYear()+ '/' + (now.getMonth() + 1 >= 10 ? now.getMonth()+ 1 : '0' + (now.getMonth() + 1))  + '/'
+        +  (now.getDate() >= 10 ? now.getDate() : '0' + now.getDate());
+
     const [modalVisible, setModalVisible] = useState(false);
     const [dateFrom, setDateFrom] = useState(date);
     const [dateTo, setDateTo] = useState(date);
@@ -99,7 +102,7 @@ const HotelDetail = ({navigation}) => {
                                         mode="date"
                                         format="YYYY/MM/DD"
                                         showIcon={false}
-                                        onDateChange={(date) => setDateFrom(date)}
+                                        onDateChange={(date1) => setDateFrom(date1)}
                                         androidMode={"default"}
                                     />
                                 </View>
@@ -112,7 +115,7 @@ const HotelDetail = ({navigation}) => {
                                         mode="date"
                                         format="YYYY/MM/DD"
                                         showIcon={false}
-                                        onDateChange={(date) => setDateTo(date)}
+                                        onDateChange={(date1) => setDateTo(date1)}
                                         androidMode={"default"}
                                     />
                                 </View>
@@ -132,7 +135,13 @@ const HotelDetail = ({navigation}) => {
                                         let startTime = new Date(dateFrom).toISOString();
                                         let endTime = new Date(dateTo).toISOString();
                                         getRoomAvailable(hotel.id, startTime, endTime);
-                                        navigation.navigate('RoomScreen' , {services : hotel.serviceTypes, hotel: hotel});
+                                        navigation.navigate('RoomScreen' , {
+                                            services : hotel.serviceTypes,
+                                            hotel: hotel,
+                                            dateFrom: dateFrom,
+                                            dateTo: dateTo,
+                                            stars
+                                        });
                                     }}
                                 >
                                     <Text style={styles.textStyle}>Submit</Text>

@@ -6,7 +6,7 @@ import {FontAwesome5} from '@expo/vector-icons';
 import {withNavigation} from "react-navigation";
 import { Ionicons } from '@expo/vector-icons';
 
-const Room = ({roomName, id, capacity, price, services, navigation, room, hotel}) => {
+const Room = ({roomName, id, capacity, price, services, navigation, room, hotel, dateFrom, dateTo, stars}) => {
     let peoples = [];
     if (capacity <= 4) {
         for (let i = 0; i < capacity; i++) {
@@ -21,7 +21,12 @@ const Room = ({roomName, id, capacity, price, services, navigation, room, hotel}
     price = Math.floor(price);
     while (price > 999) {
         var num = price % 1000;
-        priceString += '.' + num ;
+        if (num < 10) {
+            num = '00' + num
+        } else if (num < 100) {
+            num ='0' + num;
+        }
+        priceString += '.' + num  ;
         price = Math.floor(price/ 1000);
         if (price <= 999) {
             priceString = price + '' + priceString;
@@ -98,7 +103,7 @@ const Room = ({roomName, id, capacity, price, services, navigation, room, hotel}
                     style={styles.buttonBook}
                     activeOpacity={.7}
                     onPress={() => {
-                        navigation.navigate('Step1', {room: room, hotel: hotel})
+                        navigation.navigate('Step1', {room: room, hotel: hotel, dateFrom, dateTo, stars, servicesView, priceString })
                     }}
                 >
                     <Text style={styles.buttonText}>Reserve</Text>

@@ -9,11 +9,20 @@ const Step1 = ({navigation}) => {
     const {state} = useContext(AuthContext);
     let room = navigation.getParam('room');
     let hotel = navigation.getParam('hotel');
+    let dateFrom = navigation.getParam('dateFrom');
+    let dateTo = navigation.getParam('dateTo');
+    let stars = navigation.getParam('stars');
+    let servicesView = navigation.getParam('servicesView');
 
     let priceString = '';
     let price = Math.floor(room.price);
     while (price > 999) {
         let num = price % 1000;
+        if (num < 10) {
+            num = '00' + num
+        } else if (num < 100) {
+            num ='0' + num;
+        }
         priceString += '.' + num;
         price = Math.floor(price / 1000);
         if (price <= 999) {
@@ -63,7 +72,9 @@ const Step1 = ({navigation}) => {
                 <TouchableOpacity
                     style={styles.button}
                     onPress={() => {
-                        navigation.navigate('Step2', {room : room, hotel: hotel})
+                        navigation.navigate('Step2', {
+                            room, hotel, dateTo, dateFrom, stars, servicesView, priceString
+                        })
                     }}
                 >
                     <Text style={{color: 'white', fontSize: 17}}>Next step</Text>

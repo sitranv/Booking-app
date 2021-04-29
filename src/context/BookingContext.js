@@ -86,8 +86,23 @@ const getRoomAvailable = (dispatch) => {
         }
     }
 }
+
+const book = (dispatch) => {
+    return async (locationId, roomId, startTime, endTime) => {
+        try {
+            const response = await booking.post(`/customer/locations/${locationId}/book`, {
+                roomId: roomId,
+                startTime: startTime,
+                endTime: endTime
+            });
+            console.log(response);
+        } catch (e) {
+            console.log(e.messages);
+        }
+    }
+}
 export const {Provider, Context} = createDataContext(
     bookingReducer,
-    {getDataOrderByScore, getCities, getHotelByCity, getRoomAvailable},
+    {getDataOrderByScore, getCities, getHotelByCity, getRoomAvailable, book},
     {}
 )

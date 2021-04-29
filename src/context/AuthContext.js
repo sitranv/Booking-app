@@ -68,15 +68,15 @@ const tryLocalSignin = (dispatch) => {
     return async () => {
         try {
             const token = await AsyncStorage.getItem('token');
-            // console.log(token);
+            console.log(token);
             const response = await booking.get('/customer/users/me', {
-                headers : {
+                headers : { 
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + token,
                 },
             });
-            console.log(token, response);
+            // console.log(token, response);
 
             if (token) {
                 dispatch({type: 'signin', payload: {
