@@ -23,7 +23,7 @@ const RoomScreen = ({navigation}) => {
     // console.log(services)
     return (
         <SafeAreaView style={styles.container} forceInset={{top: 'always'}}>
-            <Text h3 style={{marginLeft: 6, marginVertical: 5}}>Available Rooms</Text>
+            <Text h3 style={{marginLeft: 6, marginVertical: 5}}>Available Rooms ({rooms ? rooms.length : ''})</Text>
             <FlatList
                 data={rooms}
                 keyExtractor={(item, index) => {

@@ -73,7 +73,7 @@ const Step1 = ({navigation}) => {
                     style={styles.button}
                     onPress={() => {
                         navigation.navigate('Step2', {
-                            room, hotel, dateTo, dateFrom, stars, servicesView, priceString
+                            room, hotel, dateTo, dateFrom, stars, servicesView, priceString, user: state.user
                         })
                     }}
                 >

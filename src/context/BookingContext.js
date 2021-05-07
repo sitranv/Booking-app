@@ -31,7 +31,7 @@ const getDataOrderByScore = (dispatch) => {
                 }
             });
             dispatch({type: 'get_data', payload: response.data})
-            console.log(response.data.data);
+            // console.log(response);
         } catch (e) {
             console.log(e.message);
         }
@@ -79,10 +79,9 @@ const getRoomAvailable = (dispatch) => {
                     endTime : checkout
                 }
             })
-            console.log(response);
             dispatch({type: 'get_rooms', payload: response.data})
         } catch (e) {
-
+            console.log(e.messages)
         }
     }
 }
@@ -95,9 +94,13 @@ const book = (dispatch) => {
                 startTime: startTime,
                 endTime: endTime
             });
-            console.log(response);
+
+            if (response !== undefined && response.status === 201) {
+                return true;
+            }
         } catch (e) {
             console.log(e.messages);
+            return false;
         }
     }
 }

@@ -1,18 +1,30 @@
 import React, {useContext, useState} from "react";
-import {FlatList, Image, StyleSheet, View, TouchableOpacity, Button, ActivityIndicator} from 'react-native'
+import {
+    FlatList,
+    Image,
+    StyleSheet,
+    View,
+    TouchableOpacity,
+    Button,
+    ActivityIndicator,
+    Alert,
+    Modal
+} from 'react-native'
 import {Text, ListItem, Input} from "react-native-elements";
 import {SafeAreaView} from "react-navigation";
 import {Entypo, FontAwesome, FontAwesome5, Ionicons} from "@expo/vector-icons";
 import {Context as BookingContext} from "../../../context/BookingContext";
+import Dialog from "react-native-dialog";
 
 const Step2 = ({navigation}) => {
     const {state, book} = useContext(BookingContext);
-
+    const [bookStatus, setBookStatus] = useState(false);
     let room = navigation.getParam('room');
     let hotel = navigation.getParam('hotel');
     let dateFrom = navigation.getParam('dateFrom');
     let dateTo = navigation.getParam('dateTo');
     let stars = navigation.getParam('stars');
+    let user = navigation.getParam('user');
     let servicesView = navigation.getParam('servicesView');
     const date1 = new Date(dateTo);
     const date2 = new Date(dateFrom);
@@ -94,10 +106,21 @@ const Step2 = ({navigation}) => {
             }}>
                 <View>
                     <View style={{marginVertical: 10, justifyContent: 'space-between', flexDirection: 'row'}}>
-                        <Text style={{fontSize: 18,}}>Final prices</Text>
-                        <Text style={{fontSize: 18,}}> VND {priceString}</Text>
+                        <Text style={{fontSize: 18,}}>Your full name</Text>
+                        <Text style={{fontSize: 18,}}> {user.fullName}</Text>
                     </View>
-                    <Text style={{fontSize: 18,}}>Include taxs and fees</Text>
+                    <View style={{marginVertical: 10, justifyContent: 'space-between', flexDirection: 'row'}}>
+                        <Text style={{fontSize: 18,}}>Your email</Text>
+                        <Text style={{fontSize: 18,}}>{user.email}</Text>
+                    </View>
+                    <View style={{marginVertical: 10, justifyContent: 'space-between', flexDirection: 'row'}}>
+                        <Text style={{fontSize: 18,}}>Your phone number</Text>
+                        <Text style={{fontSize: 18,}}>{user.phoneNumber}</Text>
+                    </View>
+                    <View style={{marginVertical: 10, justifyContent: 'space-between', flexDirection: 'row'}}>
+                        <Text style={{fontSize: 18, fontWeight: 'bold'}}>Final prices</Text>
+                        <Text style={{fontSize: 18, fontWeight: 'bold'}}> VND {priceString}</Text>
+                    </View>
                 </View>
                 <View style={styles.buttonContainer}>
                     <View style={{flexDirection: 'column', marginLeft: 10}}>
@@ -119,14 +142,30 @@ const Step2 = ({navigation}) => {
                             <Text style={{color: '#3ac569', textAlign: 'left'}}>Includes taxs and fees</Text>
                         </View>
                     </View>
+
+                    <View>
+                        <Dialog.Container visible={bookStatus}>
+                            <Dialog.Title style={{fontWeight: 'bold'}}>Notification</Dialog.Title>
+                            <Dialog.Description>
+                                The room you choose has sent a booking request to admin, please check your email regularly for reservation status updates.
+                            </Dialog.Description>
+                            <Dialog.Button label="OK" onPress={() => {
+                                setBookStatus(false)
+                                navigation.navigate('HomeScreen');
+                            }}/>
+                        </Dialog.Container>
+                    </View>
+
                     <TouchableOpacity
                         style={styles.button}
                         onPress={() => {
-                            book(hotel.id, room.id, new Date(dateFrom).toISOString(), new Date(dateTo).toISOString());
+                            let status = book(hotel.id, room.id, new Date(dateFrom).toISOString(), new Date(dateTo).toISOString())
+                            setBookStatus(true)
                         }}
                     >
                         <Text style={{color: 'white', fontSize: 17}}>Book now</Text>
                     </TouchableOpacity>
+
                 </View>
             </View>
         </SafeAreaView>

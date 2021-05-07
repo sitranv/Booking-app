@@ -75,7 +75,8 @@ const HotelDetail = ({navigation}) => {
                 </View>
                 <View style={styles.container3}>
                     <Text numberOfLines={8} ellipsizeMode='tail' style={styles.priceMobile}>Mobile-only price</Text>
-                    <Text numberOfLines={8} ellipsizeMode='tail' style={styles.price}>VND {hotel.price.split('D')[1]}</Text>
+                    <Text numberOfLines={8} ellipsizeMode='tail' style={styles.price}>VND {hotel.price.includes('D') ?
+                                hotel.price.split('D')[1] : hotel.price}</Text>
                 </View>
                 <View style={styles.container2}>
                     <Text style={styles.description} numberOfLines={8} ellipsizeMode='tail'>{hotel.description}</Text>
