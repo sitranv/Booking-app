@@ -1,10 +1,10 @@
 import React, {useContext, useState} from "react";
 import {FlatList, Image, StyleSheet, View, TouchableOpacity, Button} from 'react-native'
-import {Text, ListItem, Input} from "react-native-elements";
+import {Text, Input} from "react-native-elements";
 import {SafeAreaView} from "react-navigation";
-import {Entypo, FontAwesome, FontAwesome5, Ionicons} from "@expo/vector-icons";
+import { FontAwesome5, Ionicons} from "@expo/vector-icons";
 import {Context as AuthContext} from "../../../context/AuthContext";
-
+import helper from "../../../helpers/helper";
 const Step1 = ({navigation}) => {
     const {state} = useContext(AuthContext);
     let room = navigation.getParam('room');
@@ -14,22 +14,8 @@ const Step1 = ({navigation}) => {
     let stars = navigation.getParam('stars');
     let servicesView = navigation.getParam('servicesView');
 
-    let priceString = '';
     let price = Math.floor(room.price);
-    while (price > 999) {
-        let num = price % 1000;
-        if (num < 10) {
-            num = '00' + num
-        } else if (num < 100) {
-            num ='0' + num;
-        }
-        priceString += '.' + num;
-        price = Math.floor(price / 1000);
-        if (price <= 999) {
-            priceString = price + '' + priceString;
-            break;
-        }
-    }
+    let priceString = helper().formatPrice(price);
     return (
         <SafeAreaView style={styles.container} forceInset={{top: 'always'}}>
             <View style={{ marginHorizontal: 5}}>

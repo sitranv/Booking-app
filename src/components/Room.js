@@ -5,6 +5,7 @@ import {AntDesign, FontAwesome} from '@expo/vector-icons';
 import {FontAwesome5} from '@expo/vector-icons';
 import {withNavigation} from "react-navigation";
 import { Ionicons } from '@expo/vector-icons';
+import helper from "../helpers/helper";
 
 const Room = ({roomName, id, capacity, price, services, navigation, room, hotel, dateFrom, dateTo, stars}) => {
     let peoples = [];
@@ -17,22 +18,9 @@ const Room = ({roomName, id, capacity, price, services, navigation, room, hotel,
             peoples.push(<AntDesign name="user" size={18} color="black"/>);
         }
     }
-    let priceString= '';
     price = Math.floor(price);
-    while (price > 999) {
-        var num = price % 1000;
-        if (num < 10) {
-            num = '00' + num
-        } else if (num < 100) {
-            num ='0' + num;
-        }
-        priceString += '.' + num  ;
-        price = Math.floor(price/ 1000);
-        if (price <= 999) {
-            priceString = price + '' + priceString;
-            break;
-        }
-    }
+    let priceString= helper().formatPrice(price);
+
     let services_temp = [];
     let index = [];
     for (let i = 0; i < Math.round(services.length / 2) - 1; i++) {
@@ -46,13 +34,15 @@ const Room = ({roomName, id, capacity, price, services, navigation, room, hotel,
 
     let servicesView = [];
 
-    for(let i = 0; i < services_temp.length; i++) {
-        servicesView.push(
-            <View style={{flexDirection:'row'}}>
-                <Image source={{uri: services_temp[i].icon}} style={{width : 22, height: 22}}/>
-                <Text style={{marginLeft: 10}}>{services_temp[i].name}</Text>
-            </View> 
-        )
+    if (services_temp == undefined) {
+        for(let i = 0; i < services_temp.length; i++) {
+            servicesView.push(
+                <View style={{flexDirection:'row'}}>
+                    <Image source={{uri: services_temp[i].icon}} style={{width : 22, height: 22}}/>
+                    <Text style={{marginLeft: 10}}>{services_temp[i].name}</Text>
+                </View>
+            )
+        }
     }
 
     return (

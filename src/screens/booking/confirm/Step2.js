@@ -15,10 +15,11 @@ import {SafeAreaView} from "react-navigation";
 import {Entypo, FontAwesome, FontAwesome5, Ionicons} from "@expo/vector-icons";
 import {Context as BookingContext} from "../../../context/BookingContext";
 import Dialog from "react-native-dialog";
-
+import helper  from "../../../helpers/helper";
 const Step2 = ({navigation}) => {
     const {state, book} = useContext(BookingContext);
-    const [bookStatus, setBookStatus] = useState(false);
+    const [bookStatus, setBookStatus] = useState(null);
+    const [message, setMessage] = useState("");
     let room = navigation.getParam('room');
     let hotel = navigation.getParam('hotel');
     let dateFrom = navigation.getParam('dateFrom');
@@ -30,23 +31,17 @@ const Step2 = ({navigation}) => {
     const date2 = new Date(dateFrom);
     const diffTime = Math.abs(date2 - date1);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-
-    let priceString= '';
-    let price = Math.floor(diffDays * room.price);
-    while (price > 999) {
-        var num = price % 1000;
-        if (num < 10) {
-            num = '00' + num
-        } else if (num < 100) {
-            num ='0' + num;
-        }
-        priceString += '.' + num ;
-        price = Math.floor(price/ 1000);
-        if (price <= 999) {
-            priceString = price + '' + priceString;
-            break;
-        }
+    let price = Math.floor(room.price);
+    let priceString= helper().formatPrice(price);
+    let priceArray = priceString.split('.');
+    price = 0;
+    for (let i = 0; i < priceArray.length; i++) {
+        price = price * 1000 + parseInt(priceArray[i]);
     }
+    price *= diffDays;
+    console.log(price);
+    priceString = helper().formatPrice(price);
+
     return (
         <SafeAreaView style={[styles.container]}>
             <View style={{
@@ -144,13 +139,14 @@ const Step2 = ({navigation}) => {
                     </View>
 
                     <View>
-                        <Dialog.Container visible={bookStatus}>
+                        <Dialog.Container visible={bookStatus == null ? null : bookStatus}>
                             <Dialog.Title style={{fontWeight: 'bold'}}>Notification</Dialog.Title>
                             <Dialog.Description>
                                 The room you choose has sent a booking request to admin, please check your email regularly for reservation status updates.
+                                You can view your booking at <Text style={{fontWeight: 'bold'}}>Booking History</Text> in <Text style={{fontWeight: 'bold'}}>Account Setting</Text>
                             </Dialog.Description>
                             <Dialog.Button label="OK" onPress={() => {
-                                setBookStatus(false)
+                                setBookStatus(null)
                                 navigation.navigate('HomeScreen');
                             }}/>
                         </Dialog.Container>
@@ -160,12 +156,18 @@ const Step2 = ({navigation}) => {
                         style={styles.button}
                         onPress={() => {
                             let status = book(hotel.id, room.id, new Date(dateFrom).toISOString(), new Date(dateTo).toISOString())
-                            setBookStatus(true)
+                            if (status) {
+                                setMessage("The room you choose has sent a booking request to admin, please check your email regularly for reservation status updates.\n" +
+                                    "You can view your booking at Booking History in Account Setting.");
+                            }
+                            else {
+                                setMessage("Error when booking!")
+                            }
+                            setBookStatus(status)
                         }}
                     >
                         <Text style={{color: 'white', fontSize: 17}}>Book now</Text>
                     </TouchableOpacity>
-
                 </View>
             </View>
         </SafeAreaView>

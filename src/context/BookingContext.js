@@ -15,6 +15,8 @@ const bookingReducer = (state, action) => {
             return {...state, hotel: action.payload}
         case 'get_rooms' :
             return {...state, availableRooms: action.payload}
+        case 'get_histories' :
+            return {...state, histories: action.payload}
         default:
             return state;
     }
@@ -25,7 +27,7 @@ const getDataOrderByScore = (dispatch) => {
         try {
             const response = await booking.get('/customer/locations', {
                 params: {
-                    limit: 10,
+                    limit: 50,
                     sort: 'score,DESC',
                     join: ['locationType', 'city', 'rooms', 'serviceTypes'],
                 }
@@ -43,7 +45,6 @@ const getCities = (dispatch) => {
         try {
             const response = await booking.get('/app/config');
             dispatch({type: 'get_cities', payload: response.data})
-            // console.log(response.data);
         } catch (e) {
             console.log(e.message);
         }
@@ -55,7 +56,7 @@ const getHotelByCity = (dispatch) => {
         try {
             const response = await booking.get('/customer/locations', {
                 params: {
-                    limit: 10,
+                    limit: 100,
                     sort: 'score,DESC',
                     join: ['locationType', 'city', 'rooms', 'serviceTypes'],
                     filter: `cityId||$eq||${cityId}`
@@ -104,8 +105,20 @@ const book = (dispatch) => {
         }
     }
 }
+
+const getBookingHistory = (dispatch) => {
+    return async () => {
+        try {
+            const response = await booking.get('/customer/booking-histories');
+            dispatch({type: 'get_histories', payload: response.data.results})
+        } catch (e) {
+            console.log(e)
+        }
+    }
+}
+
 export const {Provider, Context} = createDataContext(
     bookingReducer,
-    {getDataOrderByScore, getCities, getHotelByCity, getRoomAvailable, book},
+    {getDataOrderByScore, getCities, getHotelByCity, getRoomAvailable, book, getBookingHistory},
     {}
 )

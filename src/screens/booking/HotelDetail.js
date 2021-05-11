@@ -8,9 +8,11 @@ import {Entypo, FontAwesome} from "@expo/vector-icons";
 import DatePicker from 'react-native-datepicker'
 import Room from "../../components/Room";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
+import Dialog from "react-native-dialog";
 
 const HotelDetail = ({navigation}) => {
     const {state, getRoomAvailable} = useContext(BookingContext);
+    const [checkExistAdmin, setCheckExistAdmin] = useState(true);
 
     let now = new Date();
     let date = now.getFullYear()+ '/' + (now.getMonth() + 1 >= 10 ? now.getMonth()+ 1 : '0' + (now.getMonth() + 1))  + '/'
@@ -32,6 +34,7 @@ const HotelDetail = ({navigation}) => {
             stars.push(<FontAwesome name="star-o" size={20} color="#FFBC42" style={{marginLeft: 4}}/>);
         }
     }
+    console.log(hotel);
     return (
         <SafeAreaView forceInset={{top: 'always'}} style={styles.container}>
             <SwiperFlatList
@@ -148,17 +151,31 @@ const HotelDetail = ({navigation}) => {
                                     <Text style={styles.textStyle}>Submit</Text>
                                 </TouchableOpacity>
                             </View>
-
                         </View>
                     </View>
                 </Modal>
 
+                <View>
+                    <Dialog.Container visible={!checkExistAdmin}>
+                        <Dialog.Title style={{fontWeight: 'bold'}}>Notification</Dialog.Title>
+                        <Dialog.Description>
+                            The location you want to book is not yet registered. Please choose another location.
+                        </Dialog.Description>
+                        <Dialog.Button label="OK" onPress={() => {
+                            setCheckExistAdmin(true)
+                        }}/>
+                    </Dialog.Container>
+                </View>
 
                 <TouchableOpacity
                     activeOpacity={.7}
                     style={styles.buttonView}
                     onPress={() => {
-                        setModalVisible(!modalVisible);
+                        if (hotel.userId === null) {
+                            setCheckExistAdmin(false);
+                        } else {
+                            setModalVisible(!modalVisible);
+                        }
                     }}>
                     <Text style={{color: 'white', fontSize: 16,}}>Book now</Text>
                 </TouchableOpacity>

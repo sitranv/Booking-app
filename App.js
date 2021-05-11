@@ -3,6 +3,7 @@ import {createAppContainer, createSwitchNavigator} from "react-navigation";
 import {createStackNavigator} from "react-navigation-stack";
 import {createBottomTabNavigator} from 'react-navigation-tabs'
 import {LogBox} from 'react-native';
+import { AntDesign } from '@expo/vector-icons';
 
 LogBox.ignoreLogs(['Warning: ...']); // Ignore log notification by message
 LogBox.ignoreAllLogs()
@@ -19,6 +20,7 @@ import Step2 from './src/screens/booking/confirm/Step2'
 import {Provider as AuthProvider} from './src/context/AuthContext'
 import {Provider as BookingProvider} from './src/context/BookingContext'
 import Hotel from "./src/components/Hotel";
+import BookingHistory from "./src/screens/booking/BookingHistory";
 
 console.disableYellowBox = true
 const switchNavigator = createSwitchNavigator({
@@ -35,8 +37,29 @@ const switchNavigator = createSwitchNavigator({
             RoomScreen: RoomScreen,
             Step1: Step1,
             Step2: Step2,
+        }, {
+            navigationOptions : {
+                tabBarLabel: "Vibo",
+                tabBarIcon: () => {
+                    return (
+                        <AntDesign name="home" size={20} color="black" />
+                    )
+                }
+            }
         }),
-        AccountScreen: AccountScreen
+        AccountScreen: createStackNavigator({
+            AccountScreen : AccountScreen,
+            BookingHistory : BookingHistory,
+            },{
+            navigationOptions :{
+                tabBarLabel: "Account",
+                tabBarIcon : () => {
+                    return (
+                        <AntDesign name="user" size={20} color="black" />
+                    );
+                }
+            }
+        })
     }),
 })
 
