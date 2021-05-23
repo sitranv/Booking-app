@@ -4,8 +4,8 @@ import {Text} from "react-native-elements";
 import helper from "../helpers/helper";
 
 const History = ({location, endTime, room, startTime, status}) => {
-    startTime = helper().formatDate(startTime);
-    endTime = helper().formatDate(endTime);
+    let startTime1 = helper().formatDate(startTime);
+    let endTime1 = helper().formatDate(endTime);
 
     const date1 = new Date(endTime);
     const date2 = new Date(startTime);
@@ -18,12 +18,14 @@ const History = ({location, endTime, room, startTime, status}) => {
     for (let i = 0; i < priceArray.length; i++) {
         price = price * 1000 + parseInt(priceArray[i]);
     }
+
     price *= diffDays;
+
     priceString = helper().formatPrice(price);
     let color = '';
     switch (status) {
         case "PENDING":
-            color = '#218380';
+            color = '#E53A40';
             break;
         case "ACCEPTED":
             color = '#3ac569'
@@ -52,11 +54,11 @@ const History = ({location, endTime, room, startTime, status}) => {
             <View style={styles.bookingInfo}>
                 <View style={styles.infoContent}>
                     <Text style={{fontSize: 16}}>Check-in:</Text>
-                    <Text style={{fontSize: 16}}>{startTime}</Text>
+                    <Text style={{fontSize: 16}}>{startTime1}</Text>
                 </View>
                 <View style={styles.infoContent}>
                     <Text style={{fontSize: 16}}>Check-out:</Text>
-                    <Text style={{fontSize: 16}}>{endTime}</Text>
+                    <Text style={{fontSize: 16}}>{endTime1}</Text>
                 </View>
                 <View style={styles.infoContent}>
                     <Text style={{color: 'red', fontSize: 16}}>Total price:</Text>

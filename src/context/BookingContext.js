@@ -90,6 +90,7 @@ const getRoomAvailable = (dispatch) => {
 
 const book = (dispatch) => {
     return async (locationId, roomId, startTime, endTime) => {
+        console.log(locationId, roomId, startTime, endTime);
         try {
             const response = await booking.post(`/customer/locations/${locationId}/book`, {
                 roomId: roomId,
@@ -111,9 +112,10 @@ const getBookingHistory = (dispatch) => {
     return async () => {
         try {
             const response = await booking.get('/customer/booking-histories', {
-                // params: {
-                //     sort: 'createdAt,DESC',
-                // }
+                params: {
+                    take: 100,
+                    order: '-createdAt',
+                }
             });
             dispatch({type: 'get_histories', payload: response.data.results})
         } catch (e) {

@@ -20,7 +20,8 @@ const helper = () => {
         },
 
         formatDate : (date) => {
-            return new Date(date).toJSON().slice(0,10).split('-').reverse().join('/')
+            let temp = new Date(date);
+            return new Date(temp.setDate(temp.getDate() + 1)).toJSON().slice(0,10).split('-').reverse().join('/')
         }
     }
 }
