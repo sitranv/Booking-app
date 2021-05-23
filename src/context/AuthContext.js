@@ -13,7 +13,7 @@ const authReducer = (state, action) => {
         case 'clear_error':
             return {...state, errorMessage:''}
         case 'signout':
-            return {token: null, errorMessage:''}
+            return {token: null, errorMessage:'', user: null}
         default:
             return state;
     }
@@ -24,7 +24,7 @@ const signup = (dispatch) => {
         try {
             const response = await booking.post('/customer/auth/sign-up', user);
             await AsyncStorage.setItem('token', response.data.accessToken);
-
+            console.log(response);
             dispatch({type: 'signin', payload: {
                     token : response.data.accessToken,
                     user: response.data.user
@@ -69,23 +69,16 @@ const tryLocalSignin = (dispatch) => {
         try {
             const token = await AsyncStorage.getItem('token');
             console.log(token);
-            // console.log(token, response);
             if (token) {
-                const response = await booking.get('/customer/users/me', {
-                    headers : {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token,
-                    },
-                });
-                console.log(response)
-                dispatch({type: 'signin', payload: {
-                        token : token,
-                        user : response.data,
-                    }
-                });
+                // const response = await booking.get('/customer/users/me', {
+                //     headers : {
+                //         'Accept': 'application/json',
+                //         'Content-Type': 'application/json',
+                //         'Authorization': 'Bearer ' + token,
+                //     },
+                // });
+                // dispatch({type: 'signin', payload: {token : token, user : response.data}});
                 navigate('Home');
-                // navigate('Room');
             } else {
                 navigate('SigninScreen')
             }
@@ -99,7 +92,6 @@ const tryLocalSignin = (dispatch) => {
 const signout = (dispatch) => {
     return async () => {
         await AsyncStorage.removeItem('token');
-        await AsyncStorage.removeItem('user_info');
         dispatch({type : 'signout'});
         navigate('SignupScreen');
     }
@@ -108,5 +100,5 @@ const signout = (dispatch) => {
 export const {Provider, Context} = createDataContext(
     authReducer,
     {signup, signin, clearErrorMessage, tryLocalSignin, signout},
-    {token : null, errorExistEmail : ''}
+    {token : null, errorExistEmail : '', user : null}
 )

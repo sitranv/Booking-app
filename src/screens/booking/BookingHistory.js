@@ -20,7 +20,7 @@ const BookingHistory = ({navigation}) => {
     console.log(histories);
     return (
         <SafeAreaView forceInset={{top: 'always'}} style={styles.container}>
-            <Text h3 style={{marginLeft: 10}}>Booking History</Text>
+            <Text h3 style={{marginLeft: 10}}>Booking History ({histories ? histories.length : 0})</Text>
             <FlatList
                 style={{marginTop: 5}}
                 data={histories}

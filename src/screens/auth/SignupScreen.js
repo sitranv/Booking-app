@@ -7,7 +7,7 @@ import {MaterialIcons} from '@expo/vector-icons';
 import Header from '../../components/Header';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import NavLink from "../../components/Navlink";
-import { Context as AuthContext } from '../../context/AuthContext';
+import {Context as AuthContext} from '../../context/AuthContext';
 import ErrCommon from "../../components/ErrCommon";
 import {NavigationEvents} from "react-navigation";
 
@@ -25,8 +25,8 @@ const SignupScreen = () => {
             <NavigationEvents
                 onWillBlur={clearErrorMessage}
             />
-            <Header  text="Signup to Vibo"/>
-            {state.errorMessage? <ErrCommon text={state.errorMessage}/>: null}
+            <Header text="Signup to Vibo"/>
+            {state.errorMessage ? <ErrCommon text={state.errorMessage}/> : null}
             <KeyboardAwareScrollView
                 style={styles.input}
                 behavior="padding"
@@ -85,12 +85,14 @@ const SignupScreen = () => {
                 <TouchableOpacity
                     activeOpacity={.7}
                     style={styles.buttonView}
-                    onPress={() => {signup({email, password, city, address})}}
+                    onPress={() => {
+                        signup({fullName, email, password, city, address})
+                    }}
                 >
                     <Text style={{color: 'white',}}>Signup</Text>
                 </TouchableOpacity>
                 <NavLink
-                    routeName = "SigninScreen"
+                    routeName="SigninScreen"
                     text="Already have an account? Signin instead"
                 />
             </KeyboardAwareScrollView>

@@ -34,7 +34,7 @@ const HotelDetail = ({navigation}) => {
             stars.push(<FontAwesome name="star-o" size={20} color="#FFBC42" style={{marginLeft: 4}}/>);
         }
     }
-    console.log(hotel);
+
     return (
         <SafeAreaView forceInset={{top: 'always'}} style={styles.container}>
             <SwiperFlatList
@@ -135,17 +135,22 @@ const HotelDetail = ({navigation}) => {
                                     style={[styles.button, styles.buttonSubmit, {marginLeft : 15}]}
                                     onPress={() => {
                                         // console.log(dateFrom, dateTo);
-                                        setModalVisible(!modalVisible)
-                                        let startTime = new Date(dateFrom).toISOString();
-                                        let endTime = new Date(dateTo).toISOString();
-                                        getRoomAvailable(hotel.id, startTime, endTime);
-                                        navigation.navigate('RoomScreen' , {
-                                            services : hotel.serviceTypes,
-                                            hotel: hotel,
-                                            dateFrom: dateFrom,
-                                            dateTo: dateTo,
-                                            stars
-                                        });
+                                        let compare = new Date(dateFrom).getTime() <= new Date(dateTo);
+                                        if (compare) {
+                                            setModalVisible(!modalVisible)
+                                            let startTime = new Date(dateFrom).toISOString();
+                                            let endTime = new Date(dateTo).toISOString();
+                                            getRoomAvailable(hotel.id, startTime, endTime);
+                                            navigation.navigate('RoomScreen' , {
+                                                services : hotel.serviceTypes,
+                                                hotel: hotel,
+                                                dateFrom: dateFrom,
+                                                dateTo: dateTo,
+                                                stars
+                                            });
+                                        } else {
+                                            alert("The check-in date must be less than the check-out date.")
+                                        }
                                     }}
                                 >
                                     <Text style={styles.textStyle}>Submit</Text>
@@ -277,7 +282,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        marginTop: 22
+        marginTop: 22,
     },
     modalView: {
         margin: 20,
@@ -292,7 +297,7 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.25,
         shadowRadius: 4,
-        elevation: 5
+        elevation: 5,
     },
     button: {
         borderRadius: 20,

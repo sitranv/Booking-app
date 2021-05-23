@@ -1,6 +1,5 @@
 import React from "react";
 import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native'
-import {Entypo} from "@expo/vector-icons";
 
 const City = ({thumbnail, name, averagePrice, getHotelByCity, cityId}) => {
     return ( <TouchableOpacity

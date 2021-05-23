@@ -7,7 +7,7 @@ import City from "../../components/City";
 import Header from "../../components/Header";
 
 const HomeScreen = () => {
-    const {state, getDataOrderByScore, getCities, getHotelByCity, searchField} = useContext(BookingContext);
+    const {state, getDataOrderByScore, getCities, getHotelByCity} = useContext(BookingContext);
     useEffect(() => {
         getDataOrderByScore();
         getCities();
@@ -59,6 +59,7 @@ const HomeScreen = () => {
                                     image={item.images}
                                     name={item.name}
                                     address={item.city.name}
+                                    check={item.userId !== null}
                                 />
                             </View>)
                     }}

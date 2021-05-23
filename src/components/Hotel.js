@@ -4,7 +4,7 @@ import {Text} from "react-native-elements";
 import { Entypo } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
 import {withNavigation} from "react-navigation";
-const Hotel = ({image, name, address, navigation, score, id}) => {
+const Hotel = ({image, name, address, navigation, score, id, check}) => {
     let stars = [];
     for (let i = 0; i < 5 ; i++) {
         if(i < parseInt(score / 2)) {
@@ -37,6 +37,7 @@ const Hotel = ({image, name, address, navigation, score, id}) => {
                             <Text style={styles.score}>{score}</Text>
                         </View>
                     </View>
+                    {!check ? <Text style={{color: 'red'}}>* Unregistered</Text> : null}
                 </View>
             </View>
         </TouchableOpacity>

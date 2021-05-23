@@ -1,5 +1,5 @@
 import React, {useContext} from 'react'
-import {View, StyleSheet, TouchableOpacity} from 'react-native'
+import {View, StyleSheet, TouchableOpacity, AsyncStorage} from 'react-native'
 import {SafeAreaView} from "react-navigation";
 import {Button, Text} from "react-native-elements";
 import {Context as AuthContext} from "../context/AuthContext";
@@ -8,9 +8,11 @@ import BookingHistory from "./booking/BookingHistory";
 
 const AccountScreen = ({navigation}) => {
     const {signout, state} = useContext(AuthContext);
+    let user = state.user;
+    console.log(user);
     return (<SafeAreaView style={styles.container} forceInset={{top: 'always'}}>
         <Header text="Vibo"/>
-        <Text h3> Hi {state.user.fullName ? state.user.fullName : null}</Text>
+        <Text h3> Hi {user ? user.fullName : null}</Text>
         {/*<Text>{state.user.email}</Text>*/}
         {/*<Text>{state.user.city}</Text>*/}
         {/*<Text>{state.user.address}</Text>*/}
@@ -31,6 +33,13 @@ const AccountScreen = ({navigation}) => {
                 <Text style={styles.buttonText}>Signout</Text>
             </TouchableOpacity>
         </View>
+        <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+                signout()
+            }}>
+            <Text style={styles.buttonText}>Update profile</Text>
+        </TouchableOpacity>
     </SafeAreaView>)
 }
 
@@ -52,7 +61,8 @@ const styles = StyleSheet.create({
         marginHorizontal: 10,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#30A9DE'
+        backgroundColor: '#30A9DE',
+        marginVertical: 10
     },
     buttonContainer: {
         flexDirection: 'row',

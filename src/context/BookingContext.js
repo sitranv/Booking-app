@@ -8,7 +8,7 @@ const bookingReducer = (state, action) => {
     switch (action.type) {
         case 'get_data':
             let searchField = action.name ? action.name : 'Featured hotels'
-            return {...state, data: action.payload.data , searchField}
+            return {...state, data: action.payload.data, searchField}
         case 'get_cities' :
             return {...state, cities: action.payload.cities}
         case 'get_hotel_by_id':
@@ -30,6 +30,7 @@ const getDataOrderByScore = (dispatch) => {
                     limit: 50,
                     sort: 'score,DESC',
                     join: ['locationType', 'city', 'rooms', 'serviceTypes'],
+                    filter: 'cityId||$notnull'
                 }
             });
             dispatch({type: 'get_data', payload: response.data})
@@ -63,7 +64,7 @@ const getHotelByCity = (dispatch) => {
                 }
             });
             // console.log(cityId);
-            dispatch({type: 'get_data', payload: response.data, name : cityName})
+            dispatch({type: 'get_data', payload: response.data, name: cityName})
             // console.log(response.data)
         } catch (e) {
             console.log(e.message)
@@ -76,8 +77,8 @@ const getRoomAvailable = (dispatch) => {
         try {
             const response = await booking.get(`/customer/locations/${locationId}/bookings`, {
                 params: {
-                    startTime : checkin,
-                    endTime : checkout
+                    startTime: checkin,
+                    endTime: checkout
                 }
             })
             dispatch({type: 'get_rooms', payload: response.data})
@@ -109,7 +110,11 @@ const book = (dispatch) => {
 const getBookingHistory = (dispatch) => {
     return async () => {
         try {
-            const response = await booking.get('/customer/booking-histories');
+            const response = await booking.get('/customer/booking-histories', {
+                // params: {
+                //     sort: 'createdAt,DESC',
+                // }
+            });
             dispatch({type: 'get_histories', payload: response.data.results})
         } catch (e) {
             console.log(e)
