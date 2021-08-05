@@ -33,13 +33,13 @@ const AccountScreen = ({navigation}) => {
                 <Text style={styles.buttonText}>Signout</Text>
             </TouchableOpacity>
         </View>
-        <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-                signout()
-            }}>
-            <Text style={styles.buttonText}>Update profile</Text>
-        </TouchableOpacity>
+        {/*<TouchableOpacity*/}
+        {/*    style={styles.button}*/}
+        {/*    onPress={() => {*/}
+        {/*        // signout()*/}
+        {/*    }}>*/}
+        {/*    <Text style={styles.buttonText}>Update profile</Text>*/}
+        {/*</TouchableOpacity>*/}
     </SafeAreaView>)
 }
 
@@ -73,4 +73,6 @@ const styles = StyleSheet.create({
         color: 'white'
     }
 });
+
+
 export default AccountScreen;

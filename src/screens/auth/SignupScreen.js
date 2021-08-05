@@ -19,6 +19,7 @@ const SignupScreen = () => {
     const [address, setAddress] = useState(null);
     const [password, setPassword] = useState(null);
     const [city, setCity] = useState(null);
+    const [phoneNumber, setPhoneNumber] = useState(null);
     // const [image, setImage] = useState(null);
     return (
         <View style={styles.container}>
@@ -53,6 +54,14 @@ const SignupScreen = () => {
                     autoCapitalize='none'
                     autoCorrect={false}
                     leftIcon={<Icon style={{marginRight: 5}} name="address-book-o" size={24} color="black"/>}
+                />
+                <Input
+                    placeholder="Phone"
+                    value={phoneNumber}
+                    onChangeText={setPhoneNumber}
+                    autoCapitalize='none'
+                    autoCorrect={false}
+                    leftIcon={<MaterialIcons style={{marginRight: 5}} name="local-phone" size={24} color="black" />}
                 />
                 <Input
                     secureTextEntry
