@@ -1,37 +1,61 @@
 import React, {useContext, useState} from 'react'
-import {View, StyleSheet, TouchableOpacity, Image, Picker} from 'react-native';
+import {View, StyleSheet, TouchableOpacity, Image, Picker, Button} from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 import {Input, Text} from 'react-native-elements';
 import {Feather} from '@expo/vector-icons'
 import {MaterialIcons} from '@expo/vector-icons';
-import Header from '../../components/Header';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import NavLink from "../../components/Navlink";
-import {Context as AuthContext} from '../../context/AuthContext';
-import ErrCommon from "../../components/ErrCommon";
-import {NavigationEvents} from "react-navigation";
+import {Context as AuthContext} from '../context/AuthContext';
+import * as ImagePicker from 'expo-image-picker';
+import axios from "axios";
 
-const SignupScreen = () => {
-    const {state, signup, clearErrorMessage} = useContext(AuthContext);
+const UpdateAccountScreen = () => {
+    const {state, updateProfile, uploadAvatar} = useContext(AuthContext);
+    let user = state.user
 
-    const [fullName, setFullName] = useState(null);
-    const [email, setEmail] = useState(null);
-    const [address, setAddress] = useState(null);
-    const [password, setPassword] = useState(null);
-    const [city, setCity] = useState(null);
-    const [phoneNumber, setPhoneNumber] = useState(null);
+    const [fullName, setFullName] = useState(user.fullName);
+    const [email, setEmail] = useState(user.email);
+    const [address, setAddress] = useState(user.address);
+    const [city, setCity] = useState('Da Nang');
+    const [phoneNumber, setPhoneNumber] = useState('0122223123');
     // const [image, setImage] = useState(null);
+
+    const [avatar, setAvatar] = useState(user.image);
+
+    const handleChoosePhoto = async () => {
+        let image = await ImagePicker.launchImageLibraryAsync();
+        setAvatar(image);
+        let array = image.uri.split('/');
+        let fileName = image.uri.split('/')[array.length - 1];
+        let type = "";
+        if(fileName.includes('jpg')) {
+            type = 'image/jpeg'
+        } else if(fileName.includes('png')){
+            type = 'image/png'
+        }
+        let localUri = image.uri;
+        let filename = localUri.split('/').pop();
+
+        // Infer the type of the image
+        let match = /\.(\w+)$/.exec(filename);
+        let type1 = match ? `image/${match[1]}` : `image`;
+
+        uploadAvatar({fileName, type}, image, { uri: localUri, name: filename, type: type1 })
+    }
+
+
     return (
         <View style={styles.container}>
-            <NavigationEvents
-                onWillBlur={clearErrorMessage}
-            />
-            <Header text="Signup to Vibo"/>
-            {state.errorMessage ? <ErrCommon text={state.errorMessage}/> : null}
+
             <KeyboardAwareScrollView
                 style={styles.input}
                 behavior="padding"
             >
+                <TouchableOpacity onPress={handleChoosePhoto}>
+                    <Image source={{uri: avatar == null ? "https://huyhoanhotel.com/wp-content/uploads/2016/05/765-default-avatar.png":  avatar && avatar.uri}}
+                           style={styles.avatar}/>
+                </TouchableOpacity>
+
                 <Input
                     placeholder="Full name"
                     value={fullName}
@@ -61,17 +85,9 @@ const SignupScreen = () => {
                     onChangeText={setPhoneNumber}
                     autoCapitalize='none'
                     autoCorrect={false}
-                    leftIcon={<MaterialIcons style={{marginRight: 5}} name="local-phone" size={24} color="black" />}
+                    leftIcon={<MaterialIcons style={{marginRight: 5}} name="local-phone" size={24} color="black"/>}
                 />
-                <Input
-                    secureTextEntry
-                    placeholder="Password"
-                    value={password}
-                    onChangeText={setPassword}
-                    autoCapitalize='none'
-                    autoCorrect={false}
-                    leftIcon={<Feather style={{marginRight: 5}} name="lock" size={24} color="black"/>}
-                />
+
                 <View style={{marginLeft: 7, marginBottom: 8}}>
                     <View style={{flexDirection: 'row', flex: 1}}>
                         <MaterialIcons name="location-city" size={24} color="black"/>
@@ -95,22 +111,18 @@ const SignupScreen = () => {
                     activeOpacity={.7}
                     style={styles.buttonView}
                     onPress={() => {
-                        signup({fullName, email, password, city, address, phoneNumber})
+                        updateProfile({fullName, address, phoneNumber}, uploadLink.uploadUrl, avatar)
                     }}
                 >
-                    <Text style={{color: 'white',}}>Signup</Text>
+                    <Text style={{color: 'white',}}>Update</Text>
                 </TouchableOpacity>
-                <NavLink
-                    routeName="SigninScreen"
-                    text="Already have an account? Signin instead"
-                />
             </KeyboardAwareScrollView>
         </View>
 
     )
 }
 
-SignupScreen.navigationOptions = () => {
+UpdateAccountScreen.navigationOptions = () => {
     return {
         headerShown: false
     }
@@ -144,9 +156,15 @@ const styles = StyleSheet.create({
         marginTop: 10
     },
     input: {
-        marginTop: 30,
+        // marginTop: 30,
         marginBottom: 20
+    },
+    avatar: {
+        width: 150,
+        height: 150,
+        borderRadius: 150 / 2,
+        marginBottom: 10
     }
 })
 
-export default SignupScreen;
+export default UpdateAccountScreen;

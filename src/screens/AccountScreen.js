@@ -33,13 +33,13 @@ const AccountScreen = ({navigation}) => {
                 <Text style={styles.buttonText}>Signout</Text>
             </TouchableOpacity>
         </View>
-        {/*<TouchableOpacity*/}
-        {/*    style={styles.button}*/}
-        {/*    onPress={() => {*/}
-        {/*        // signout()*/}
-        {/*    }}>*/}
-        {/*    <Text style={styles.buttonText}>Update profile</Text>*/}
-        {/*</TouchableOpacity>*/}
+        <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+                navigation.navigate('UpdateAccountScreen');
+            }}>
+            <Text style={styles.buttonText}>Update profile</Text>
+        </TouchableOpacity>
     </SafeAreaView>)
 }
 

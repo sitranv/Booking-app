@@ -17,26 +17,37 @@ const bookingReducer = (state, action) => {
             return {...state, availableRooms: action.payload}
         case 'get_histories' :
             return {...state, histories: action.payload}
+        case 'paypal_link':
+            return {...state, paypal_link: action.payload.link.href, bookingDetails: action.payload}
+        case 'reset_booking_details':
+            return {...state, bookingDetails : action.payload}
         default:
             return state;
     }
 }
 
 const getDataOrderByScore = (dispatch) => {
-    return async () => {
+    return async (search) => {
         try {
+            let params = null;
+            if (search.trim() !== '') {
+                params = {
+                    s: `{"name": {"$cont": "${search}"}}`
+                }
+            }
             const response = await booking.get('/customer/locations', {
-                params: {
-                    limit: 50,
+                params : {
+                    ...params,
+                    limit: 70,
                     sort: 'score,DESC',
                     join: ['locationType', 'city', 'rooms', 'serviceTypes'],
-                    filter: 'cityId||$notnull'
+                    filter: 'cityId||$notnull',
                 }
             });
+            console.log(response);
             dispatch({type: 'get_data', payload: response.data})
-            // console.log(response);
         } catch (e) {
-            console.log(e.message);
+            console.log(e);
         }
     }
 }
@@ -92,18 +103,22 @@ const book = (dispatch) => {
     return async (locationId, roomId, startTime, endTime) => {
         console.log(locationId, roomId, startTime, endTime);
         try {
+
             const response = await booking.post(`/customer/locations/${locationId}/book`, {
                 roomId: roomId,
                 startTime: startTime,
-                endTime: endTime
+                endTime: endTime,
+                cancelUrl: "http://localhost:19000/PAYMENT_CANCELED",
+                returnUrl: "http://localhost:19000/PAYMENT_SUCCESS"
             });
-
-            if (response !== undefined && response.status === 201) {
-                return true;
-            }
+            // console.log(response)
+            dispatch({type: 'paypal_link', payload: response.data})
+            // if (response !== undefined && response.status === 201) {
+            //     return response.data.link.href;
+            // }
         } catch (e) {
-            console.log(e.messages);
-            return false;
+            console.log(e);
+            dispatch({type: 'paypal_link', payload: ''})
         }
     }
 }
@@ -124,8 +139,36 @@ const getBookingHistory = (dispatch) => {
     }
 }
 
+const getSearchLocation = (dispatch) => {
+    return async (name) => {
+        try {
+            const response = await booking.get('/customer/locations', {
+                params: {
+                    s: {"name": {"$cont": name}}
+                }
+            })
+            // console.log(response.data)
+            dispatch({type: 'get_location_search', payload: response.data});
+        } catch (e) {
+            console.log(e);
+        }
+    }
+}
+
+const capturePayment = (dispatch) => {
+    return async (locationId, bookingId) => {
+        try {
+            const response = await booking.post(`/customer/locations/${locationId}/bookings/${bookingId}/capture-payment`);
+            console.log(response);
+            dispatch({type: 'reset_booking_details', payload: {}});
+        } catch (e) {
+            console.log(e)
+        }
+    }
+}
+
 export const {Provider, Context} = createDataContext(
     bookingReducer,
-    {getDataOrderByScore, getCities, getHotelByCity, getRoomAvailable, book, getBookingHistory},
+    {getDataOrderByScore, getCities, getHotelByCity, getRoomAvailable, book, getBookingHistory, getSearchLocation, capturePayment},
     {}
 )

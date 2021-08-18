@@ -8,18 +8,26 @@ import {
     Button,
     ActivityIndicator,
     Alert,
-    Modal
+    Modal,
 } from 'react-native'
+
+import {WebView} from 'react-native-webview';
+
 import {Text, ListItem, Input} from "react-native-elements";
 import {SafeAreaView} from "react-navigation";
 import {Entypo, FontAwesome, FontAwesome5, Ionicons} from "@expo/vector-icons";
 import {Context as BookingContext} from "../../../context/BookingContext";
 import Dialog from "react-native-dialog";
-import helper  from "../../../helpers/helper";
+import helper from "../../../helpers/helper";
+
 const Step2 = ({navigation}) => {
-    const {state, book} = useContext(BookingContext);
-    const [bookStatus, setBookStatus] = useState(null);
-    const [message, setMessage] = useState("");
+    const {state, book, capturePayment} = useContext(BookingContext);
+    const [bookStatus, setBookStatus] = useState(false);
+    const [checkoutStatus, setCheckoutStatus] = useState(null)
+
+    let paypal_link = state.paypal_link;
+    let bookingDetails = state.bookingDetails;
+
     let room = navigation.getParam('room');
     let hotel = navigation.getParam('hotel');
     let dateFrom = navigation.getParam('dateFrom');
@@ -32,16 +40,25 @@ const Step2 = ({navigation}) => {
     const diffTime = Math.abs(date2 - date1);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
     let price = Math.floor(room.price);
-    let priceString= helper().formatPrice(price);
+    let priceString = helper().formatPrice(price);
     let priceArray = priceString.split('.');
     price = 0;
     for (let i = 0; i < priceArray.length; i++) {
         price = price * 1000 + parseInt(priceArray[i]);
     }
     price *= diffDays;
-    console.log(price);
     priceString = helper().formatPrice(price);
 
+    const handleResponse = (data) => {
+        if (data.url.includes('PAYMENT_SUCCESS')) {
+            setBookStatus(false);
+            setCheckoutStatus(true)
+            capturePayment(bookingDetails.locationId, bookingDetails.id);
+        } else if (data.url.includes('PAYMENT_CANCELED')) {
+            setCheckoutStatus(false)
+            setBookStatus(false);
+        }
+    }
     return (
         <SafeAreaView style={[styles.container]}>
             <View style={{
@@ -86,7 +103,8 @@ const Step2 = ({navigation}) => {
                     }}>
                         <View style={{marginVertical: 10, justifyContent: 'space-between', flexDirection: 'row'}}>
                             <Text style={{fontSize: 18,}}>For</Text>
-                            <Text style={{fontSize: 18,}}>{diffDays > 1 ? diffDays + ' nights' : diffDays + ' night'} , 1 room</Text>
+                            <Text style={{fontSize: 18,}}>{diffDays > 1 ? diffDays + ' nights' : diffDays + ' night'} ,
+                                1 room</Text>
                         </View>
                     </View>
                 </View>
@@ -95,9 +113,9 @@ const Step2 = ({navigation}) => {
                 backgroundColor: 'white',
                 paddingHorizontal: 10,
                 marginVertical: 10,
-                flexDirection:'column',
+                flexDirection: 'column',
                 justifyContent: 'space-between',
-                flex : 1
+                flex: 1
             }}>
                 <View>
                     <View style={{marginVertical: 10, justifyContent: 'space-between', flexDirection: 'row'}}>
@@ -119,7 +137,8 @@ const Step2 = ({navigation}) => {
                 </View>
                 <View style={styles.buttonContainer}>
                     <View style={{flexDirection: 'column', marginLeft: 10}}>
-                        <Text style={{fontSize: 16, textAlign: 'left'}}>Price for {diffDays > 1 ? diffDays + ' nights' : diffDays + ' night'}</Text>
+                        <Text style={{fontSize: 16, textAlign: 'left'}}>Price
+                            for {diffDays > 1 ? diffDays + ' nights' : diffDays + ' night'}</Text>
                         <View style={{flexDirection: 'row', alignSelf: 'flex-start'}}>
                             <Text style={{
                                 marginRight: 5,
@@ -138,16 +157,36 @@ const Step2 = ({navigation}) => {
                         </View>
                     </View>
 
+                    {bookStatus &&
+                    <Modal>
+                        <View style={styles.centeredView}>
+                            <Button title={"Close"} onPress={() => {
+                                setBookStatus(!bookStatus)
+                            }}/>
+                            <WebView
+                                originWhitelist={['*']}
+                                source={{uri: paypal_link}}
+                                onNavigationStateChange={
+                                    data => handleResponse(data)
+                                }
+                            />
+                        </View>
+                    </Modal>
+                    }
+
                     <View>
-                        <Dialog.Container visible={bookStatus == null ? null : bookStatus}>
-                            <Dialog.Title style={{fontWeight: 'bold'}}>Notification</Dialog.Title>
+                        <Dialog.Container visible={!bookStatus && checkoutStatus !== null}>
+                            <Dialog.Title style={{fontWeight: 'bold'}}>{checkoutStatus ? "Payment Successful" : "Payment Failed"}</Dialog.Title>
                             <Dialog.Description>
-                                The room you choose has sent a booking request to admin, please check your email regularly for reservation status updates.
-                                You can view your booking at <Text style={{fontWeight: 'bold'}}>Booking History</Text> in <Text style={{fontWeight: 'bold'}}>Account Setting</Text>
+                                {checkoutStatus &&  <Text>The room you choose has sent a booking request to admin, please check your email regularly for reservation status updates.
+                                    You can view your booking at <Text style={{fontWeight: 'bold'}}>Booking History</Text> in <Text style={{fontWeight: 'bold'}}>Account Setting</Text></Text>}
                             </Dialog.Description>
                             <Dialog.Button label="OK" onPress={() => {
-                                setBookStatus(null)
-                                navigation.navigate('HomeScreen');
+                                setCheckoutStatus(null)
+                                setBookStatus(false)
+                                if (checkoutStatus) {
+                                    navigation.navigate('HomeScreen');
+                                }
                             }}/>
                         </Dialog.Container>
                     </View>
@@ -155,15 +194,8 @@ const Step2 = ({navigation}) => {
                     <TouchableOpacity
                         style={styles.button}
                         onPress={() => {
-                            let status = book(hotel.id, room.id, new Date(dateFrom).toISOString(), new Date(dateTo).toISOString())
-                            if (status) {
-                                setMessage("The room you choose has sent a booking request to admin, please check your email regularly for reservation status updates.\n" +
-                                    "You can view your booking at Booking History in Account Setting.");
-                            }
-                            else {
-                                setMessage("Error when booking!")
-                            }
-                            setBookStatus(status)
+                            book(hotel.id, room.id, new Date(dateFrom).toISOString(), new Date(dateTo).toISOString());
+                            setBookStatus(true)
                         }}
                     >
                         <Text style={{color: 'white', fontSize: 17}}>Book now</Text>
@@ -208,6 +240,24 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginRight: 5,
         marginBottom: 10,
+    },
+    centeredView: {
+        flex: 1,
+        // justifyContent: "center",
+        // alignItems: "center",
+        // marginTop: 22
+    },
+    buttonClose: {
+        backgroundColor: "#2196F3",
+    },
+    textStyle: {
+        color: "white",
+        fontWeight: "bold",
+        textAlign: "center"
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: "center"
     }
 })
 

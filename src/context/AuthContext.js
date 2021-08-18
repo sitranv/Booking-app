@@ -2,18 +2,21 @@ import createDataContext from './createDataContext';
 import booking from "../api/booking";
 import {AsyncStorage} from "react-native";
 import {navigate} from '../navigationRef';
+import axios from "axios";
 
 
 const authReducer = (state, action) => {
     switch (action.type) {
         case 'signin':
-            return {errorMessage:'', token: action.payload.token, user: action.payload.user}
+            return {errorMessage: '', token: action.payload.token, user: action.payload.user}
         case 'add_err':
             return {...state, errorMessage: action.payload}
         case 'clear_error':
-            return {...state, errorMessage:''}
+            return {...state, errorMessage: ''}
         case 'signout':
-            return {token: null, errorMessage:'', user: null}
+            return {token: null, errorMessage: '', user: null}
+        case 'uploadImage':
+            return {...state, uploadLink: action.payload}
         default:
             return state;
     }
@@ -25,8 +28,9 @@ const signup = (dispatch) => {
             const response = await booking.post('/customer/auth/sign-up', user);
             await AsyncStorage.setItem('token', response.data.accessToken);
             console.log(response);
-            dispatch({type: 'signin', payload: {
-                    token : response.data.accessToken,
+            dispatch({
+                type: 'signin', payload: {
+                    token: response.data.accessToken,
                     user: response.data.user
                 }
             })
@@ -46,8 +50,9 @@ const signin = (dispatch) => {
             await AsyncStorage.setItem('token', response.data.accessToken);
 
             console.log(response);
-            dispatch({type: 'signin', payload: {
-                    token : response.data.accessToken,
+            dispatch({
+                type: 'signin', payload: {
+                    token: response.data.accessToken,
                     user: response.data.user
                 }
             })
@@ -71,13 +76,13 @@ const tryLocalSignin = (dispatch) => {
             console.log(token);
             if (token) {
                 const response = await booking.get('/customer/users/me', {
-                    headers : {
+                    headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json',
                         'Authorization': 'Bearer ' + token,
                     },
                 });
-                dispatch({type: 'signin', payload: {token : token, user : response.data}});
+                dispatch({type: 'signin', payload: {token: token, user: response.data}});
                 navigate('Home');
             } else {
                 navigate('SigninScreen')
@@ -92,13 +97,72 @@ const tryLocalSignin = (dispatch) => {
 const signout = (dispatch) => {
     return async () => {
         await AsyncStorage.removeItem('token');
-        dispatch({type : 'signout'});
+        dispatch({type: 'signout'});
         navigate('SignupScreen');
     }
 }
 
+const updateProfile = (dispatch) => {
+    return async (user, link, image) => {
+        try {
+            const token = await AsyncStorage.getItem('token');
+            if (token) {
+                const response = await booking.put('/customer/users/me', user, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token,
+                    },
+                });
+                // const response2 = await axios.put(link, image);
+
+                // console.log(response2);
+
+                dispatch({type: 'signin', payload: {token: token, user: response.data}});
+                // navigate('Home');
+            } else {
+                // navigate('SigninScreen')
+            }
+        } catch (e) {
+            console.log(e.response.data);
+        }
+
+    }
+}
+
+const uploadAvatar = (dispatch) => {
+    return async (file, image, formData) => {
+        try {
+            const token = await AsyncStorage.getItem('token');
+            if (token) {
+                const response = await booking.post('/signed-url-s3',
+                    file,
+                    {
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token,
+                        },
+                    });
+                console.log("fileUrl", response.data.fileUrl);
+                const response1  = await axios.put(response.data.uploadUrl, formData, {
+                    headers: {
+                        'Content-Type': formData.type,
+                    },
+                });
+                console.log("response1", response1);
+                dispatch({type: 'uploadImage', payload: response.data})
+            } else {
+                // navigate('SigninScreen')
+            }
+        } catch (e) {
+            console.log(e.response.data);
+        }
+
+    }
+}
 export const {Provider, Context} = createDataContext(
     authReducer,
-    {signup, signin, clearErrorMessage, tryLocalSignin, signout},
-    {token : null, errorExistEmail : '', user : null}
+    {signup, signin, clearErrorMessage, tryLocalSignin, signout, updateProfile, uploadAvatar},
+    {token: null, errorExistEmail: '', user: null}
 )

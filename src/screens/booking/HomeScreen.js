@@ -1,5 +1,6 @@
-import React, {useContext, useEffect} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {View, Text, StyleSheet, FlatList, Image} from 'react-native';
+import {SearchBar} from 'react-native-elements';
 import {SafeAreaView} from 'react-navigation';
 import {Context as BookingContext} from '../../context/BookingContext';
 import Hotel from "../../components/Hotel";
@@ -8,17 +9,34 @@ import Header from "../../components/Header";
 
 const HomeScreen = () => {
     const {state, getDataOrderByScore, getCities, getHotelByCity} = useContext(BookingContext);
+
+    const [search, setSearch] = useState("");
+
     useEffect(() => {
-        getDataOrderByScore();
         getCities();
     }, [])
+
+    useEffect(() => {
+        getDataOrderByScore(search);
+    }, [search])
+
     var hotel = state.data;
-    // console.log(hotel);
     var cities = state.cities;
-    // console.log(cities)
+
     return (
         <SafeAreaView forceInset={{top: 'always'}} style={styles.container}>
             <Header text="Vibo"/>
+            <SearchBar
+                placeholder="Search"
+                // data={this.state.searchResultFriendsList}
+                value={search}
+                onChangeText={setSearch}
+                style={styles.searchBar}
+                showLoading={true}
+                lightTheme={true}
+                round
+                containerStyle={styles.searchContainer}
+            />
             <View style={styles.city}>
                 <FlatList
                     showsVerticalScrollIndicator={false}
@@ -41,30 +59,34 @@ const HomeScreen = () => {
             </View>
             <View style={styles.hotels}>
                 <Text style={styles.header}>{state.searchField}</Text>
-                <FlatList
-                    showsVerticalScrollIndicator={false}
-                    showsHorizontalScrollIndicator={false}
-                    extraData={state.data}
-                    style={{marginTop: 5}}
-                    data={hotel}
-                    keyExtractor={(item, index) => {
-                        return item.id;
-                    }}
-                    renderItem={({item}) => {
-                        return (
-                            <View style={{flexDirection: 'row', flex: 1}}>
-                                <Hotel
-                                    id={item.id}
-                                    score={item.score}
-                                    image={item.images}
-                                    name={item.name}
-                                    address={item.city.name}
-                                    check={item.userId !== null}
-                                />
-                            </View>)
-                    }}
-                    numColumns={2}
-                />
+                {hotel && hotel.length > 0 &&
+                    <FlatList
+                        showsVerticalScrollIndicator={false}
+                        showsHorizontalScrollIndicator={false}
+                        extraData={state.data}
+                        style={{marginTop: 5}}
+                        data={hotel}
+                        keyExtractor={(item, index) => {
+                            return item.id;
+                        }}
+                        renderItem={({item}) => {
+                            return (
+                                <View style={{flexDirection: 'row', flex: 1}}>
+                                    <Hotel
+                                        id={item.id}
+                                        score={item.score}
+                                        image={item.images}
+                                        name={item.name}
+                                        address={item.city.name}
+                                        check={item.userId !== null}
+                                    />
+                                </View>
+                            )
+                        }}
+                        numColumns={2}
+                    />
+                }
+
             </View>
         </SafeAreaView>
     )
@@ -105,7 +127,20 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textDecorationLine: "underline",
         textDecorationStyle: "solid",
-    }
+    },
+    searchContainer: {
+        backgroundColor: '#e1eef6',
+        borderWidth: 0, //no effect
+        shadowColor: 'white', //no effect
+        borderBottomColor: 'transparent',
+        borderTopColor: 'transparent'
+    },
+    searchBar: {
+        color: 'black',
+        width: "100%",
+        borderWidth:0, //no effect
+        shadowColor: 'white', //no effect
+    },
 });
 
 export default HomeScreen;

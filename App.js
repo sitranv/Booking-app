@@ -21,6 +21,7 @@ import {Provider as AuthProvider} from './src/context/AuthContext'
 import {Provider as BookingProvider} from './src/context/BookingContext'
 import Hotel from "./src/components/Hotel";
 import BookingHistory from "./src/screens/booking/BookingHistory";
+import UpdateAccountScreen from "./src/screens/UpdateAccountScreen";
 
 console.disableYellowBox = true
 const switchNavigator = createSwitchNavigator({
@@ -50,6 +51,7 @@ const switchNavigator = createSwitchNavigator({
         AccountScreen: createStackNavigator({
             AccountScreen : AccountScreen,
             BookingHistory : BookingHistory,
+            UpdateAccountScreen: UpdateAccountScreen,
             },{
             navigationOptions :{
                 tabBarLabel: "Account",
