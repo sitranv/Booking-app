@@ -2,8 +2,6 @@ import createDataContext from './createDataContext';
 import booking from "../api/booking";
 import {AsyncStorage} from "react-native";
 import {navigate} from '../navigationRef';
-import axios from "axios";
-
 
 const authReducer = (state, action) => {
     switch (action.type) {
@@ -16,7 +14,7 @@ const authReducer = (state, action) => {
         case 'signout':
             return {token: null, errorMessage: '', user: null}
         case 'uploadImage':
-            return {...state, uploadLink: action.payload}
+            return {...state, fileUrl: action.payload}
         default:
             return state;
     }
@@ -103,7 +101,7 @@ const signout = (dispatch) => {
 }
 
 const updateProfile = (dispatch) => {
-    return async (user, link, image) => {
+    return async (user) => {
         try {
             const token = await AsyncStorage.getItem('token');
             if (token) {
@@ -114,12 +112,9 @@ const updateProfile = (dispatch) => {
                         'Authorization': 'Bearer ' + token,
                     },
                 });
-                // const response2 = await axios.put(link, image);
-
-                // console.log(response2);
 
                 dispatch({type: 'signin', payload: {token: token, user: response.data}});
-                // navigate('Home');
+                navigate('Home');
             } else {
                 // navigate('SigninScreen')
             }
@@ -131,7 +126,7 @@ const updateProfile = (dispatch) => {
 }
 
 const uploadAvatar = (dispatch) => {
-    return async (file, image, formData) => {
+    return async (file, image) => {
         try {
             const token = await AsyncStorage.getItem('token');
             if (token) {
@@ -144,14 +139,27 @@ const uploadAvatar = (dispatch) => {
                             'Authorization': 'Bearer ' + token,
                         },
                     });
-                console.log("fileUrl", response.data.fileUrl);
-                const response1  = await axios.put(response.data.uploadUrl, formData, {
+                const fileUrl = response.data.fileUrl;
+                console.log("fileUrl", fileUrl);
+
+                const imagePath = image.uri;
+                const imageExt = image.uri.split('.').pop();
+                const imageMime = `image/${imageExt}`;
+                let picture = await fetch(imagePath);
+                picture = await picture.blob();
+                const imageData = new File([picture], `photo.${imageExt}`);
+                await fetch(response.data.uploadUrl, {
+                    method: 'PUT',
+                    body: imageData,
                     headers: {
-                        'Content-Type': formData.type,
+                        'Content-Type': imageMime
                     },
-                });
-                console.log("response1", response1);
-                dispatch({type: 'uploadImage', payload: response.data})
+                }).then(response => console.log(response.json()))
+                    .catch(e => {
+                        console.log(e.response.data)
+                    });
+
+                dispatch({type: 'uploadImage', payload: fileUrl})
             } else {
                 // navigate('SigninScreen')
             }
@@ -161,6 +169,7 @@ const uploadAvatar = (dispatch) => {
 
     }
 }
+
 export const {Provider, Context} = createDataContext(
     authReducer,
     {signup, signin, clearErrorMessage, tryLocalSignin, signout, updateProfile, uploadAvatar},

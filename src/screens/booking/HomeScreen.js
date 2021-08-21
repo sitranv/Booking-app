@@ -60,31 +60,31 @@ const HomeScreen = () => {
             <View style={styles.hotels}>
                 <Text style={styles.header}>{state.searchField}</Text>
                 {hotel && hotel.length > 0 &&
-                    <FlatList
-                        showsVerticalScrollIndicator={false}
-                        showsHorizontalScrollIndicator={false}
-                        extraData={state.data}
-                        style={{marginTop: 5}}
-                        data={hotel}
-                        keyExtractor={(item, index) => {
-                            return item.id;
-                        }}
-                        renderItem={({item}) => {
-                            return (
-                                <View style={{flexDirection: 'row', flex: 1}}>
-                                    <Hotel
-                                        id={item.id}
-                                        score={item.score}
-                                        image={item.images}
-                                        name={item.name}
-                                        address={item.city.name}
-                                        check={item.userId !== null}
-                                    />
-                                </View>
-                            )
-                        }}
-                        numColumns={2}
-                    />
+                <FlatList
+                    showsVerticalScrollIndicator={false}
+                    showsHorizontalScrollIndicator={false}
+                    extraData={state.data}
+                    style={{marginTop: 5}}
+                    data={hotel}
+                    keyExtractor={(item, index) => {
+                        return item.id;
+                    }}
+                    renderItem={({item}) => {
+                        return (
+                            <View style={{flexDirection: 'row', flex: 1}}>
+                                <Hotel
+                                    id={item.id}
+                                    score={item.score}
+                                    image={item.images}
+                                    name={item.name}
+                                    address={item.city ? item.city.name : 'Unknown'}
+                                    check={item.userId !== null}
+                                />
+                            </View>
+                        )
+                    }}
+                    numColumns={2}
+                />
                 }
 
             </View>
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     searchBar: {
         color: 'black',
         width: "100%",
-        borderWidth:0, //no effect
+        borderWidth: 0, //no effect
         shadowColor: 'white', //no effect
     },
 });

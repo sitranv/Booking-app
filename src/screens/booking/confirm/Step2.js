@@ -22,7 +22,7 @@ import helper from "../../../helpers/helper";
 
 const Step2 = ({navigation}) => {
     const {state, book, capturePayment} = useContext(BookingContext);
-    const [bookStatus, setBookStatus] = useState(false);
+    const [bookStatus, setBookStatus] = useState(null);
     const [checkoutStatus, setCheckoutStatus] = useState(null)
 
     let paypal_link = state.paypal_link;
@@ -51,12 +51,10 @@ const Step2 = ({navigation}) => {
 
     const handleResponse = (data) => {
         if (data.url.includes('PAYMENT_SUCCESS')) {
-            setBookStatus(false);
             setCheckoutStatus(true)
             capturePayment(bookingDetails.locationId, bookingDetails.id);
         } else if (data.url.includes('PAYMENT_CANCELED')) {
             setCheckoutStatus(false)
-            setBookStatus(false);
         }
     }
     return (
@@ -167,7 +165,12 @@ const Step2 = ({navigation}) => {
                                 originWhitelist={['*']}
                                 source={{uri: paypal_link}}
                                 onNavigationStateChange={
-                                    data => handleResponse(data)
+                                    (data) => {
+                                        if (data.url.includes('PAYMENT_SUCCESS') || data.url.includes('PAYMENT_CANCELED')) {
+                                            setBookStatus(false);
+                                        }
+                                        handleResponse(data)
+                                    }
                                 }
                             />
                         </View>
@@ -182,10 +185,9 @@ const Step2 = ({navigation}) => {
                                     You can view your booking at <Text style={{fontWeight: 'bold'}}>Booking History</Text> in <Text style={{fontWeight: 'bold'}}>Account Setting</Text></Text>}
                             </Dialog.Description>
                             <Dialog.Button label="OK" onPress={() => {
-                                setCheckoutStatus(null)
-                                setBookStatus(false)
                                 if (checkoutStatus) {
                                     navigation.navigate('HomeScreen');
+                                    setCheckoutStatus(null)
                                 }
                             }}/>
                         </Dialog.Container>

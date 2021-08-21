@@ -12,7 +12,7 @@ import axios from "axios";
 const UpdateAccountScreen = () => {
     const {state, updateProfile, uploadAvatar} = useContext(AuthContext);
     let user = state.user
-
+    let fileUrl = state.fileUrl;
     const [fullName, setFullName] = useState(user.fullName);
     const [email, setEmail] = useState(user.email);
     const [address, setAddress] = useState(user.address);
@@ -20,11 +20,15 @@ const UpdateAccountScreen = () => {
     const [phoneNumber, setPhoneNumber] = useState('0122223123');
     // const [image, setImage] = useState(null);
 
-    const [avatar, setAvatar] = useState(user.image);
+    const [avatar, setAvatar] = useState(user.avatar);
 
     const handleChoosePhoto = async () => {
-        let image = await ImagePicker.launchImageLibraryAsync();
-        setAvatar(image);
+        let image = await ImagePicker.launchImageLibraryAsync({
+            // mediaTypes: ImagePicker.MediaTypeOptions.All,
+            // allowsEditing: true,
+            // quality: 1,
+        });
+        setAvatar(image.uri);
         let array = image.uri.split('/');
         let fileName = image.uri.split('/')[array.length - 1];
         let type = "";
@@ -33,16 +37,9 @@ const UpdateAccountScreen = () => {
         } else if(fileName.includes('png')){
             type = 'image/png'
         }
-        let localUri = image.uri;
-        let filename = localUri.split('/').pop();
-
-        // Infer the type of the image
-        let match = /\.(\w+)$/.exec(filename);
-        let type1 = match ? `image/${match[1]}` : `image`;
-
-        uploadAvatar({fileName, type}, image, { uri: localUri, name: filename, type: type1 })
+        console.log('image', image)
+        uploadAvatar({fileName, type}, image)
     }
-
 
     return (
         <View style={styles.container}>
@@ -52,7 +49,7 @@ const UpdateAccountScreen = () => {
                 behavior="padding"
             >
                 <TouchableOpacity onPress={handleChoosePhoto}>
-                    <Image source={{uri: avatar == null ? "https://huyhoanhotel.com/wp-content/uploads/2016/05/765-default-avatar.png":  avatar && avatar.uri}}
+                    <Image source={{uri: avatar == null ? "https://huyhoanhotel.com/wp-content/uploads/2016/05/765-default-avatar.png":  avatar}}
                            style={styles.avatar}/>
                 </TouchableOpacity>
 
@@ -111,7 +108,7 @@ const UpdateAccountScreen = () => {
                     activeOpacity={.7}
                     style={styles.buttonView}
                     onPress={() => {
-                        updateProfile({fullName, address, phoneNumber}, uploadLink.uploadUrl, avatar)
+                        updateProfile({fullName, address, phoneNumber, avatar: fileUrl})
                     }}
                 >
                     <Text style={{color: 'white',}}>Update</Text>
