@@ -48,7 +48,7 @@ const History = ({location, endTime, room, startTime, status}) => {
                 <View style={styles.hotelDetail}>
                     <Text style={{fontSize: 16, fontWeight: 'bold'}} numberOfLines={1}>{location.name}</Text>
                     <Text style={{fontSize: 16}} numberOfLines={3}>{room.name}</Text>
-                    <Text>Status : <Text style={{color: color}}>{status}</Text></Text>
+                    {/*<Text>Status : <Text style={{color: color}}>{status}</Text></Text>*/}
                 </View>
             </View>
             <View style={styles.bookingInfo}>
